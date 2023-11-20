@@ -200,7 +200,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                 nrows, ncols = int(parameter_array.shape[0]), int(parameter_array.shape[1])
                 for row in range(0, nrows):
                     for col in range(0, ncols):
-                        f.write(str(np.round(parameter_array[row, col], 6)) + ' ')
+                        f.write(str(np.round(parameter_array[row, col], 7)) + ' ')
                     f.write('\n')
             if verbose:
                 print('writing flux ratio output to ' + filename_mags)
@@ -208,7 +208,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                 nrows, ncols = int(mags_out.shape[0]), int(mags_out.shape[1])
                 for row in range(0, nrows):
                     for col in range(0, ncols):
-                        f.write(str(np.round(mags_out[row, col], 6)) + ' ')
+                        f.write(str(np.round(mags_out[row, col], 5)) + ' ')
                     f.write('\n')
 
             if readout_macromodel_samples:
@@ -224,7 +224,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                         write_param_names_macromodel_samples = False
                     for row in range(0, nrows):
                         for col in range(0, ncols):
-                            f.write(str(np.round(macromodel_samples_array[row, col], 6)) + ' ')
+                            f.write(str(np.round(macromodel_samples_array[row, col], 5)) + ' ')
                         f.write('\n')
             parameter_array = None
             mags_out = None
