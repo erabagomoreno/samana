@@ -177,7 +177,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
             if verbose:
                 print('final data readout...')
         if readout_sampling_rate and write_sampling_rate:
-            with open(filename_sampling_rate, 'a') as f:
+            with open(filename_sampling_rate, 'w') as f:
                 f.write(str(np.round(sampling_rate, 2)) + ' ')
                 f.write('\n')
 
