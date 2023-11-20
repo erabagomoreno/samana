@@ -6,7 +6,7 @@
 import unittest
 from click.testing import CliRunner
 
-from samana import samana
+from samana import forward_model
 from samana import cli
 
 

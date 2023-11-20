@@ -1,0 +1,125 @@
+from lenstronomy.LensModel.Util.decouple_multi_plane_util import setup_grids, coordinates_and_deflections, setup_lens_model
+import numpy as np
+from lenstronomy.LightModel.light_model import LightModel
+
+def magnification_finite_decoupled(source_model, kwargs_source, x_image, y_image,
+                                   lens_model_init, kwargs_lens_init, kwargs_lens, index_lens_split,
+                                   grid_size, grid_resolution, r_step_factor=10.0):
+    """
+    """
+    lens_model_fixed, lens_model_free, kwargs_lens_fixed, kwargs_lens_free, z_source, z_split, cosmo_bkg = \
+        setup_lens_model(lens_model_init, kwargs_lens_init, index_lens_split)
+    grid_x_large, grid_y_large, interp_points_large, npix_large = setup_grids(grid_size, grid_resolution,
+                                                      0.0, 0.0)
+    grid_r = np.sqrt(grid_x_large**2 + grid_y_large**2)
+    grid_r = grid_r.ravel()
+    grid_x_large = grid_x_large.ravel()
+    grid_y_large = grid_y_large.ravel()
+    r_step = grid_size / r_step_factor
+    magnifications = []
+    flux_arrays = []
+    for (x_img, y_img) in zip(x_image, y_image):
+        mag, flux_array = mag_finite_single_image(source_model, kwargs_source, lens_model_fixed, lens_model_free, kwargs_lens_fixed,
+                            kwargs_lens_free, kwargs_lens, z_split, z_source,
+                            cosmo_bkg, x_img, y_img, grid_x_large, grid_y_large,
+                            grid_r, r_step, grid_resolution, grid_size, z_split, z_source)
+        magnifications.append(mag)
+        flux_arrays.append(flux_array.reshape(npix_large, npix_large))
+    return np.array(magnifications), flux_arrays
+
+def mag_finite_single_image(source_model, kwargs_source, lens_model_fixed, lens_model_free, kwargs_lens_fixed,
+                            kwargs_lens_free, kwargs_lens, z_split, z_source,
+                            cosmo_bkg, x_image, y_image, grid_x_large, grid_y_large,
+                            grid_r, r_step, grid_resolution, grid_size_max, zlens, zsource):
+    """
+
+    """
+    # initalize flux array
+    flux_array = np.zeros(len(grid_x_large))
+    # setup ray tracing info
+    xD = np.zeros_like(flux_array)
+    yD = np.zeros_like(flux_array)
+    alpha_x_foreground = np.zeros_like(flux_array)
+    alpha_y_foreground = np.zeros_like(flux_array)
+    alpha_x_background = np.zeros_like(flux_array)
+    alpha_y_background = np.zeros_like(flux_array)
+    r_min = 0.0
+    r_max = r_min + r_step
+    magnification_last = 0.0
+    inds_compute = np.array([])
+    Td = cosmo_bkg.T_xy(0, zlens)
+    Ts = cosmo_bkg.T_xy(0, zsource)
+    Tds = cosmo_bkg.T_xy(zlens, zsource)
+    reduced_to_phys = cosmo_bkg.d_xy(0, zsource) / cosmo_bkg.d_xy(zlens, zsource)
+    while True:
+        # select new coordinates to ray-trace through
+        inds_compute, inds_outside_r, inds_computed = _inds_compute_grid(grid_r, r_min, r_max, inds_compute)
+        x_points_temp = grid_x_large[inds_compute] + x_image
+        y_points_temp = grid_y_large[inds_compute] + y_image
+
+        # compute lensing stuff at these coordinates
+        _xD, _yD, _alpha_x_foreground, _alpha_y_foreground, _alpha_x_background, _alpha_y_background = \
+            coordinates_and_deflections(lens_model_fixed, lens_model_free, kwargs_lens_fixed, kwargs_lens_free,
+                                        x_points_temp, y_points_temp, z_split, z_source, cosmo_bkg)
+        # update the master grids with the new information
+        xD[inds_compute] = _xD
+        yD[inds_compute] = _yD
+        alpha_x_foreground[inds_compute] = _alpha_x_foreground
+        alpha_y_foreground[inds_compute] = _alpha_y_foreground
+        alpha_x_background[inds_compute] = _alpha_x_background
+        alpha_y_background[inds_compute] = _alpha_y_background
+
+        # ray trace to source plane
+        x = xD[inds_computed]
+        y = yD[inds_computed]
+        # compute the deflection angles from the main deflector
+        deflection_x_main, deflection_y_main = lens_model_free.alpha(
+            x / Td, y / Td, kwargs_lens
+        )
+        deflection_x_main *= reduced_to_phys
+        deflection_y_main *= reduced_to_phys
+
+        # add the main deflector to the deflection field
+        alpha_x = alpha_x_foreground[inds_computed] - deflection_x_main
+        alpha_y = alpha_y_foreground[inds_computed] - deflection_y_main
+
+        # combine deflections
+        alpha_background_x = alpha_x + alpha_x_background[inds_computed]
+        alpha_background_y = alpha_y + alpha_y_background[inds_computed]
+
+        # ray propagation to the source plane with the small angle approximation
+        beta_x = x / Ts + alpha_background_x * Tds / Ts
+        beta_y = y / Ts + alpha_background_y * Tds / Ts
+
+        sb = source_model.surface_brightness(beta_x, beta_y, kwargs_source)
+        flux_array[inds_computed] = sb
+        flux_array[inds_outside_r] = 0.0
+        magnification_temp = np.sum(flux_array) * grid_resolution ** 2
+        diff = (
+            abs(magnification_temp - magnification_last) / magnification_temp
+        )
+        r_min += r_step
+        r_max += r_step
+        if r_max >= grid_size_max:
+            break
+        elif diff < 0.001 and magnification_temp > 0.0001:  # we want to avoid situations with zero flux
+            break
+        else:
+            magnification_last = magnification_temp
+    return magnification_temp, flux_array
+
+def _inds_compute_grid(grid_r, r_min, r_max, inds_compute):
+    condition1 = grid_r >= r_min
+    condition2 = grid_r < r_max
+    condition = np.logical_and(condition1, condition2)
+    inds_compute_new = np.where(condition)[0]
+    inds_outside_r = np.where(grid_r > r_max)[0]
+    inds_computed = np.append(inds_compute, inds_compute_new).astype(int)
+    return inds_compute_new, inds_outside_r, inds_computed
+
+def setup_gaussian_source(source_fwhm_pc, source_x, source_y, astropy_cosmo, z_source):
+
+    kpc_per_arcsec = 1/astropy_cosmo.arcsec_per_kpc_proper(z_source).value
+    source_sigma = 1e-3 * source_fwhm_pc / 2.354820 / kpc_per_arcsec
+    kwargs_source_light = [{'amp': 1.0, 'center_x': source_x, 'center_y': source_y, 'sigma': source_sigma}]
+    return LightModel(['GAUSSIAN']), kwargs_source_light
