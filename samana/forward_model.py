@@ -1,5 +1,5 @@
 from pyHalo.preset_models import preset_model_from_name
-from samana.forward_model_util import filenames, sample_prior, align_realization
+from samana.forward_model_util import filenames, sample_prior, align_realization, flux_ratio_summary_statistic, flux_ratio_likelihood
 from lenstronomy.LensModel.lens_model import LensModel
 from lenstronomy.Util.magnification_finite_util import auto_raytracing_grid_resolution, auto_raytracing_grid_size
 from lenstronomy.Workflow.fitting_sequence import FittingSequence
@@ -112,7 +112,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
         if random_seed > 4294967295:
             random_seed = random_seed - 4294967296
         magnifications, images, realization_samples, source_samples, macromodel_samples, macromodel_samples_fixed, \
-        logL_imaging_data, fitting_sequence, stat, param_names_realization, param_names_source, param_names_macro, \
+        logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, param_names_realization, param_names_source, param_names_macro, \
         param_names_macro_fixed = forward_model_single_iteration(data_class, model, preset_model_name, kwargs_sample_realization,
                                             kwargs_sample_source, kwargs_sample_fixed_macromodel, log_mlow_mass_sheets,
                                             rescale_grid_size, rescale_grid_resolution, verbose, random_seed, n_pso_particles,
@@ -138,9 +138,11 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
             n_kept += 1
             params = np.append(realization_samples, source_samples)
             params = np.append(params, stat)
+            params = np.append(params, flux_ratio_likelihood_weight)
             params = np.append(params, logL_imaging_data)
             params = np.append(params, random_seed)
-            param_names = param_names_realization + param_names_source + ['summary_statistic', 'logL_image_data', 'seed']
+            param_names = param_names_realization + param_names_source + ['summary_statistic', 'flux_ratio_likelihood',
+                                                                          'logL_image_data', 'seed']
             acceptance_ratio = accepted_realizations_counter / iteration_counter
 
             if parameter_array is None:
@@ -374,41 +376,22 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         print('imaging data likelihood (without custom mask): ', logL_imaging_data_no_custom_mask)
         print('imaging data likelihood (without custom mask): ', logL_imaging_data)
 
-    magnification_uncertainties = data_class.flux_uncertainty
-    _flux_ratios_data = np.array(data_class.magnifications[1:]) / data_class.magnifications[0]
+    stat, flux_ratios, flux_ratios_data = flux_ratio_summary_statistic(data_class.magnifications,
+                                                                       magnifications,
+                                                                       data_class.flux_uncertainty,
+                                                                       data_class.keep_flux_ratio_index,
+                                                                       data_class.uncertainty_in_fluxes)
 
-    # account for measurement uncertainties in the measured fluxes or flux ratios
-    if data_class.uncertainty_in_fluxes:
-        mags_with_uncertainties = []
-        for j, mag in enumerate(magnifications):
-            delta_m = np.random.normal(0.0, magnification_uncertainties[j] * mag)
-            m = mag + delta_m
-            mags_with_uncertainties.append(m)
-        _flux_ratios = np.array(mags_with_uncertainties)[1:] / mags_with_uncertainties[0]
-    else:
-        _fr = magnifications[1:] / magnifications[0]
-        fluxratios_with_uncertainties = []
-        for k, fr in enumerate(_fr):
-            df = np.random.normal(0, fr * magnification_uncertainties[k])
-            new_fr = fr + df
-            fluxratios_with_uncertainties.append(new_fr)
-        _flux_ratios = np.array(fluxratios_with_uncertainties)
-    flux_ratios_data = []
-    flux_ratios = []
-    for idx in data_class.keep_flux_ratio_index:
-        flux_ratios.append(_flux_ratios[idx])
-        flux_ratios_data.append(_flux_ratios_data[idx])
-
-    # Now we compute the summary statistic
-    stat = 0
-    for f_i_data, f_i_model in zip(flux_ratios_data, flux_ratios):
-        stat += (f_i_data - f_i_model) ** 2
-    stat = np.sqrt(stat)
+    flux_ratio_likelihood_weight = flux_ratio_likelihood(data_class.magnifications, magnifications,
+                                                         data_class.flux_uncertainty, data_class.uncertainty_in_fluxes,
+                                                         data_class.keep_flux_ratio_index)
 
     if verbose:
         print('flux ratios data: ', flux_ratios_data)
         print('flux ratios model: ', flux_ratios)
         print('statistic: ', stat)
+        print('flux_ratio_likelihood_weight', flux_ratio_likelihood_weight)
+
     if test_mode:
         from lenstronomy.Plots.model_plot import ModelPlot
         from lenstronomy.Plots import chain_plot
@@ -461,5 +444,5 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         a=input('continue')
 
     return magnifications, images, realization_samples, source_samples, samples_macromodel, samples_macromodel_fixed, \
-           logL_imaging_data, fitting_sequence, stat, realization_param_names, source_param_names, param_names_macro, \
+           logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, realization_param_names, source_param_names, param_names_macro, \
            param_names_macro_fixed

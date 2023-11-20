@@ -171,3 +171,81 @@ def align_realization(realization, lens_model_list_macro, redshift_list_macro, k
     ray_interp_y = [interp1d(distances, angular_coordinates_y)]
     realization = realization.shift_background_to_source(ray_interp_x[0], ray_interp_y[0])
     return realization, ray_interp_x, ray_interp_y, lens_model, kwargs_lens
+
+def flux_ratio_summary_statistic(normalized_magnifcations_measured, model_magnifications,
+                          measurement_uncertainties, keep_flux_ratio_index=[0, 1, 2], uncertainty_in_fluxes=True):
+    """
+    Computes the summary statistic corresponding to a set of flux ratios
+    :param normalized_magnifcations_measured:
+    :param model_magnifications:
+    :param uncertainty_in_fluxes:
+    :param magnification_uncertainties:
+    :param keep_flux_ratio_index:
+    :return:
+    """
+    _flux_ratios_data = np.array(normalized_magnifcations_measured[1:]) / normalized_magnifcations_measured[0]
+    # account for measurement uncertainties in the measured fluxes or flux ratios
+    if uncertainty_in_fluxes:
+        assert len(measurement_uncertainties) == len(model_magnifications)
+        mags_with_uncertainties = []
+        for j, mag in enumerate(model_magnifications):
+            delta_m = np.random.normal(0.0, measurement_uncertainties[j] * mag)
+            m = mag + delta_m
+            mags_with_uncertainties.append(m)
+        _flux_ratios = np.array(mags_with_uncertainties)[1:] / mags_with_uncertainties[0]
+    else:
+        assert len(measurement_uncertainties) == len(model_magnifications) - 1
+        _fr = model_magnifications[1:] / model_magnifications[0]
+        fluxratios_with_uncertainties = []
+        for k, fr in enumerate(_fr):
+            df = np.random.normal(0, fr * measurement_uncertainties[k])
+            new_fr = fr + df
+            fluxratios_with_uncertainties.append(new_fr)
+        _flux_ratios = np.array(fluxratios_with_uncertainties)
+    flux_ratios_data = []
+    flux_ratios = []
+    for idx in keep_flux_ratio_index:
+        flux_ratios.append(_flux_ratios[idx])
+        flux_ratios_data.append(_flux_ratios_data[idx])
+    # Now we compute the summary statistic
+    stat = 0
+    for f_i_data, f_i_model in zip(flux_ratios_data, flux_ratios):
+        stat += (f_i_data - f_i_model) ** 2
+    stat = np.sqrt(stat)
+    return stat, flux_ratios, flux_ratios_data
+
+def flux_ratio_likelihood(measured_fluxes, model_fluxes, measurement_uncertainties, uncertainty_in_fluxes,
+                          keep_flux_ratio_index=[0, 1, 2], tolerance=0.03):
+    """
+
+    :param measured_fluxes:
+    :param model_fluxes:
+    :param measurement_uncertainties:
+    :param uncertainty_in_fluxes:
+    :param keep_flux_ratio_index:
+    :param tolerance:
+    :return:
+    """
+    if uncertainty_in_fluxes:
+        n_draw = 500000
+        measured_flux_ratios = measured_fluxes[1:] / measured_fluxes[0]
+        _model_flux = np.random.normal(model_fluxes, measurement_uncertainties, size=(n_draw, 4))
+        model_flux_ratios = _model_flux[:, 1:] / _model_flux[:, 0, np.newaxis]
+        delta = 0
+        for i in range(0, 3):
+            if i in keep_flux_ratio_index:
+                delta += (measured_flux_ratios[i] - model_flux_ratios[:, i]) ** 2
+        delta = np.sqrt(delta)
+        importance_weight = np.sum(delta <= tolerance) / n_draw
+        return importance_weight
+
+    else:
+        model_flux_ratios = model_fluxes[1:] / model_fluxes[0]
+        measured_flux_ratios = measured_fluxes[1:] / measured_fluxes[0]
+        importance_weight = 0.0
+        for i in range(0, 3):
+            if i not in keep_flux_ratio_index:
+                continue
+            df = (model_flux_ratios[i] - measured_flux_ratios[i]) / measurement_uncertainties[i]
+            importance_weight += df ** 2
+        return np.exp(-0.5 * importance_weight)

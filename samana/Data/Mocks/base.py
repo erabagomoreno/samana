@@ -7,7 +7,7 @@ from copy import deepcopy
 class MockBase(ImagingDataBase):
 
     def __init__(self, z_lens, z_source, x_image, y_image, magnifications,
-                 astrometric_uncertainties, flux_uncertainties, image_data):
+                 astrometric_uncertainties, flux_ratio_uncertainties, image_data):
 
         # here we specify whether measurement uncertainties are quoted for flux ratios or fluxes
         uncertainty_in_fluxes = False
@@ -28,7 +28,7 @@ class MockBase(ImagingDataBase):
         likelihood_mask, likelihood_mask_imaging_weights = self.likelihood_masks(x_image, y_image, image_data)
         super(MockBase, self).__init__(z_lens, z_source,
                                         kwargs_data_joint, np.array(x_image), np.array(y_image),
-                                        np.array(magnifications), astrometric_uncertainties, flux_uncertainties,
+                                        np.array(magnifications), astrometric_uncertainties, flux_ratio_uncertainties,
                                         uncertainty_in_fluxes, keep_flux_ratio_index, likelihood_mask,
                                         likelihood_mask_imaging_weights)
 

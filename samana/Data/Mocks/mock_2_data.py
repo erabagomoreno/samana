@@ -14,6 +14,12 @@ class Mock2Data(MockBase):
         magnification_measurement_errors = [-0.04338515, -0.01028729, -0.28550458,  0.13827848]
         magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
         astrometric_uncertainties = [0.005] * 4
-        flux_uncertainties = [0.03] * 4
+        flux_uncertainties = [0.03] * 3
+
+        self.a3a_true = 0.0002277
+        self.a4a_true = -0.004348
+        self.delta_phi_m3_true = -0.067025
+        self.delta_phi_m4_true = 0.0
+
         super(Mock2Data, self).__init__(z_lens, z_source, x_image, y_image,
                                     magnifications, astrometric_uncertainties, flux_uncertainties, image_data)
