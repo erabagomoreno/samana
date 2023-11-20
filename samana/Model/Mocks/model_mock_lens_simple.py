@@ -36,6 +36,8 @@ class MockModelBase(ModelBase):
                              'force_no_add_image': True,
                              'source_marg': False,
                              'image_position_uncertainty': 5e-3,
+                             'check_matched_source_position': True,
+                             'source_position_sigma': 0.0001,
                              'source_position_likelihood': False,
                              'prior_lens': self.prior_lens,
                              'image_likelihood_mask_list': [self._data.likelihood_mask],

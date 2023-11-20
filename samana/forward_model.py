@@ -1,5 +1,6 @@
 from pyHalo.preset_models import preset_model_from_name
-from samana.forward_model_util import filenames, sample_prior, align_realization, flux_ratio_summary_statistic, flux_ratio_likelihood
+from samana.forward_model_util import filenames, sample_prior, align_realization, \
+    flux_ratio_summary_statistic, flux_ratio_likelihood, check_solution
 from lenstronomy.LensModel.lens_model import LensModel
 from lenstronomy.Util.magnification_finite_util import auto_raytracing_grid_resolution, auto_raytracing_grid_size
 from lenstronomy.Workflow.fitting_sequence import FittingSequence

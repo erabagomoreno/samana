@@ -249,3 +249,33 @@ def flux_ratio_likelihood(measured_fluxes, model_fluxes, measurement_uncertainti
             df = (model_flux_ratios[i] - measured_flux_ratios[i]) / measurement_uncertainties[i]
             importance_weight += df ** 2
         return np.exp(-0.5 * importance_weight)
+
+def check_solution(source_x, source_y, tolerance=0.0001):
+    """
+    Verifies the degree to which the lens equation is satisfied based on the scatter in the source position
+    :param source_x: source coordinate
+    :param source_y: source coordiante
+    :param tolerance: tolerance applied in the source plane
+    :return: metric
+    """
+    num_images = len(source_x)
+    penalty = 0
+    if num_images == 4:
+        penalty += (source_x[0] - source_x[1]) ** 2
+        penalty += (source_x[0] - source_x[2]) ** 2
+        penalty += (source_x[0] - source_x[3]) ** 2
+        penalty += (source_x[1] - source_x[2]) ** 2
+        penalty += (source_x[1] - source_x[3]) ** 2
+        penalty += (source_x[2] - source_x[3]) ** 2
+        penalty += (source_y[0] - source_y[1]) ** 2
+        penalty += (source_y[0] - source_y[2]) ** 2
+        penalty += (source_y[0] - source_y[3]) ** 2
+        penalty += (source_y[1] - source_y[2]) ** 2
+        penalty += (source_y[1] - source_y[3]) ** 2
+        penalty += (source_y[2] - source_y[3]) ** 2
+    elif num_images == 2:
+        penalty += (source_x[0] - source_x[1]) ** 2
+        penalty += (source_y[0] - source_y[1]) ** 2
+    else:
+        raise Exception('check solution only implemented for 2 and 4 images')
+    return np.sqrt(penalty) / tolerance / num_images
