@@ -93,17 +93,31 @@ class Output(object):
 
     @property
     def param_dict(self):
+
         if self._param_dict is None:
-            print('parameter names need to be specified to create a param dictionary')
-            return None
+            if self._param_names is not None:
+                assert len(self._param_names) == self.parameters.shape[1]
+                self._param_dict = {}
+                for i, name in enumerate(self._param_names):
+                    self._param_dict[name] = self.parameters[:, i]
+            else:
+                print('parameter names need to be specified to create a param dictionary')
+                return None
         else:
             return self._param_dict
 
     @property
     def macromodel_samples_dict(self):
+        
         if self._macromodel_samples_dict is None:
-            print('macromodel parameter names need to be specified to create a param dictionary')
-            return None
+            if self._macromodel_sample_names is not None:
+                assert len(self._macromodel_sample_names) == self.macromodel_samples.shape[1]
+                self._macromodel_samples_dict = {}
+                for i, name in enumerate(self._macromodel_sample_names):
+                    self._macromodel_samples_dict[name] = self.macromodel_samples[:, i]
+            else:
+                print('parameter names need to be specified to create a param dictionary')
+                return None
         else:
             return self._macromodel_samples_dict
 
