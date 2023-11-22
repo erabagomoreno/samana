@@ -9,7 +9,7 @@ class Mock3Model(MockModelBase):
 
     def setup_source_light_model(self):
         source_model_list = ['SERSIC_ELLIPSE']
-        kwargs_source_init = [{'amp': 10.0, 'center_x': -0.0, 'center_y': -0.0, 'e1': 0.1,
+        kwargs_source_init = [{'amp': 18.0, 'center_x': -0.0, 'center_y': -0.0, 'e1': 0.1,
                   'e2': -0.2, 'R_sersic': 0.047, 'n_sersic': 3.8}]
         kwargs_source_sigma = [{'amp': 5.0, 'R_sersic': 0.05, 'n_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1,
                                 'center_y': 0.1}]
