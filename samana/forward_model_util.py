@@ -231,7 +231,10 @@ def flux_ratio_likelihood(measured_fluxes, model_fluxes, measurement_uncertainti
     if uncertainty_in_fluxes:
         n_draw = 500000
         measured_flux_ratios = measured_fluxes[1:] / measured_fluxes[0]
-        _model_flux = np.random.normal(model_fluxes, measurement_uncertainties, size=(n_draw, 4))
+        if measurement_uncertainties is None:
+            _model_flux = deepcopy(model_fluxes)
+        else:
+            _model_flux = np.random.normal(model_fluxes, measurement_uncertainties, size=(n_draw, 4))
         model_flux_ratios = _model_flux[:, 1:] / _model_flux[:, 0, np.newaxis]
         delta = 0
         for i in range(0, 3):
@@ -248,7 +251,11 @@ def flux_ratio_likelihood(measured_fluxes, model_fluxes, measurement_uncertainti
         for i in range(0, 3):
             if i not in keep_flux_ratio_index:
                 continue
-            df = (model_flux_ratios[i] - measured_flux_ratios[i]) / measurement_uncertainties[i]
+            if measurement_uncertainties is None:
+                # pick a fiducial uncertainty; all we really need is the relative likelihood anyways
+                df = (model_flux_ratios[i] - measured_flux_ratios[i]) / 0.01
+            else:
+                df = (model_flux_ratios[i] - measured_flux_ratios[i]) / measurement_uncertainties[i]
             importance_weight += df ** 2
         return np.exp(-0.5 * importance_weight)
 
