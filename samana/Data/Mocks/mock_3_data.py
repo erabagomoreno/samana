@@ -7,10 +7,10 @@ class Mock3Data(MockBase):
     def __init__(self):
 
         z_lens = 0.5
-        z_source = 2.0
-        x_image = [ 0.48314461, -0.54340102, -0.94422129,  0.68977071]
-        y_image = [ 1.09978087, -0.89038174,  0.0485766 , -0.54368415]
-        magnifications_true = [3.99566627, 6.91309483, 4.62162504, 4.0917622 ]
+        z_source = 2.5
+        x_image = [ 0.26197365,  0.37192752,  0.99587974, -0.89833527]
+        y_image = [-0.98968167,  0.99370493,  0.21072101, -0.01553163]
+        magnifications_true = [5.1207985 , 5.22847917, 5.41861705, 2.92272106]
         magnification_measurement_errors = 0.0
         magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
         astrometric_uncertainties = [0.003] * 4

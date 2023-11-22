@@ -8,9 +8,9 @@ class Mock1Data(MockBase):
 
         z_lens = 0.5
         z_source = 2.2
-        x_image = [-0.93265855,  0.78855685, -0.25439243,  0.71549713]
-        y_image = [-0.70236205,  0.62673126,  0.88038215, -0.52959132]
-        magnifications_true = [4.42309835, 11.66150862, 4.57630222, 4.64745929]
+        x_image = [-0.92161217,  0.78024418, -0.25056735,  0.70611926]
+        y_image = [-0.6914899 ,  0.61451654,  0.86960051, -0.52450815]
+        magnifications_true = [ 4.34866761, 10.45921158,  4.45857144,  4.52709824]
         magnification_measurement_errors = 0.0
         magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
         astrometric_uncertainties = [0.003] * 4
