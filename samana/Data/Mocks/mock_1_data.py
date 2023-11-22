@@ -11,10 +11,10 @@ class Mock1Data(MockBase):
         x_image = [-0.93265855,  0.78855685, -0.25439243,  0.71549713]
         y_image = [-0.70236205,  0.62673126,  0.88038215, -0.52959132]
         magnifications_true = [4.42309835, 11.66150862, 4.57630222, 4.64745929]
-        magnification_measurement_errors = [0.21553918, -0.21402008, -0.07251221, -0.14959734]
+        magnification_measurement_errors = 0.0
         magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
-        astrometric_uncertainties = [0.005] * 4
-        flux_ratio_uncertainties = [0.03] * 3
+        astrometric_uncertainties = [0.003] * 4
+        flux_ratio_uncertainties = None
 
         self.a3a_true = -0.004010
         self.a4a_true = -0.004488

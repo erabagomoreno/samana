@@ -1,4 +1,7 @@
 import numpy as np
+from lenstronomy.Util.param_util import shear_cartesian2polar
+from lenstronomy.Util.param_util import ellipticity2phi_q
+
 
 class Output(object):
 
@@ -35,6 +38,55 @@ class Output(object):
             self._macromodel_samples_dict = {}
             for i, name in enumerate(macromodel_sample_names):
                 self._macromodel_samples_dict[name] = macromodel_samples[:, i]
+
+    @property
+    def flux_ratios(self):
+
+        if not hasattr(self, '_flux_ratios'):
+            self._flux_ratios = self.image_magnifications[:, 1:] / self.image_magnifications[:, 0, np.newaxis]
+        return self._flux_ratios
+
+    def parameter_array(self, param_names):
+
+        samples = np.empty((self.parameters.shape[0], len(param_names)))
+        for i, param_name in enumerate(param_names):
+            if param_name == 'f2/f1':
+                samples[:, i] = self.flux_ratios[:, 0]
+            elif param_name == 'f3/f1':
+                samples[:, i] = self.flux_ratios[:, 1]
+            elif param_name == 'f4/f1':
+                samples[:, i] = self.flux_ratios[:, 2]
+            else:
+                samples[:, i] = self.param_dict[param_name]
+        return samples
+
+    def macromodel_parameter_array(self, param_names):
+
+        if 'q' in param_names or 'phi_q' in param_names:
+            phi_q, q = ellipticity2phi_q(self.macromodel_samples_dict['e1'],
+                                         self.macromodel_samples_dict['e2'])
+        if 'gamma_ext' in param_names or 'phi_gamma' in param_names:
+            phi_gamma, gamma_ext = shear_cartesian2polar(self.macromodel_samples_dict['gamma1'],
+                                                         self.macromodel_samples_dict['gamma2'])
+        samples = np.empty((self.parameters.shape[0], len(param_names)))
+        for i, param_name in enumerate(param_names):
+            if param_name == 'q':
+                samples[:, i] = q
+            elif param_name == 'phi_q':
+                samples[:, i] = phi_q
+            elif param_name == 'gamma_ext':
+                samples[:, i] = gamma_ext
+            elif param_name == 'phi_gamma':
+                samples[:, i] = phi_gamma
+            elif param_name == 'f2/f1':
+                samples[:, i] = self.flux_ratios[:, 0]
+            elif param_name == 'f3/f1':
+                samples[:, i] = self.flux_ratios[:, 1]
+            elif param_name == 'f4/f1':
+                samples[:, i] = self.flux_ratios[:, 2]
+            else:
+                samples[:, i] = self.macromodel_samples_dict[param_name]
+        return samples
 
     @classmethod
     def from_raw_output(cls, output_path, job_index_min, job_index_max, fitting_kwargs_list=None):
@@ -108,7 +160,7 @@ class Output(object):
 
     @property
     def macromodel_samples_dict(self):
-        
+
         if self._macromodel_samples_dict is None:
             if self._macromodel_sample_names is not None:
                 assert len(self._macromodel_sample_names) == self.macromodel_samples.shape[1]

@@ -113,7 +113,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
         if random_seed > 4294967295:
             random_seed = random_seed - 4294967296
         magnifications, images, realization_samples, source_samples, macromodel_samples, macromodel_samples_fixed, \
-        logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, param_names_realization, param_names_source, param_names_macro, \
+        logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, bic, param_names_realization, param_names_source, param_names_macro, \
         param_names_macro_fixed = forward_model_single_iteration(data_class, model, preset_model_name, kwargs_sample_realization,
                                             kwargs_sample_source, kwargs_sample_fixed_macromodel, log_mlow_mass_sheets,
                                             rescale_grid_size, rescale_grid_resolution, verbose, random_seed, n_pso_particles,
@@ -138,11 +138,12 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
             accepted_realizations_counter += 1
             n_kept += 1
             params = np.append(realization_samples, source_samples)
+            params = np.append(params, bic)
             params = np.append(params, stat)
             params = np.append(params, flux_ratio_likelihood_weight)
             params = np.append(params, logL_imaging_data)
             params = np.append(params, random_seed)
-            param_names = param_names_realization + param_names_source + ['summary_statistic', 'flux_ratio_likelihood',
+            param_names = param_names_realization + param_names_source + ['bic', 'summary_statistic', 'flux_ratio_likelihood',
                                                                           'logL_image_data', 'seed']
             acceptance_ratio = accepted_realizations_counter / iteration_counter
 
@@ -387,11 +388,14 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                                                          data_class.flux_uncertainty, data_class.uncertainty_in_fluxes,
                                                          data_class.keep_flux_ratio_index)
 
+    bic = fitting_sequence.bic
+
     if verbose:
         print('flux ratios data: ', flux_ratios_data)
         print('flux ratios model: ', flux_ratios)
         print('statistic: ', stat)
         print('flux_ratio_likelihood_weight', flux_ratio_likelihood_weight)
+        print('BIC: ', bic)
 
     if test_mode:
         from lenstronomy.Plots.model_plot import ModelPlot
@@ -445,5 +449,5 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         a=input('continue')
 
     return magnifications, images, realization_samples, source_samples, samples_macromodel, samples_macromodel_fixed, \
-           logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, realization_param_names, source_param_names, param_names_macro, \
+           logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, bic, realization_param_names, source_param_names, param_names_macro, \
            param_names_macro_fixed

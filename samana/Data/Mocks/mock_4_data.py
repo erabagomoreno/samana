@@ -11,10 +11,10 @@ class Mock4Data(MockBase):
         x_image = [ 0.26058618,  0.37927667,  1.00484952, -0.9052914 ]
         y_image = [-0.99863191,  1.00107117,  0.20801605, -0.01308953]
         magnifications_true = [5.2155646 , 5.40706899, 5.56605396, 2.98821292]
-        magnification_measurement_errors = [ 0.00791124,  0.08109814, -0.16629849,  0.0621786 ]
+        magnification_measurement_errors = 0.0
         magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
-        astrometric_uncertainties = [0.005] * 4
-        flux_uncertainties = [0.03] * 3
+        astrometric_uncertainties = [0.003] * 4
+        flux_ratio_uncertainties = None
 
         self.a3a_true = 0.00225
         self.a4a_true = 0.000450
@@ -22,4 +22,4 @@ class Mock4Data(MockBase):
         self.delta_phi_m4_true = 0.0
 
         super(Mock4Data, self).__init__(z_lens, z_source, x_image, y_image,
-                                    magnifications, astrometric_uncertainties, flux_uncertainties, image_data)
+                                    magnifications, astrometric_uncertainties, flux_ratio_uncertainties, image_data)

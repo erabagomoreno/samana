@@ -3,6 +3,7 @@ from scipy.stats.kde import gaussian_kde
 from scipy.interpolate import interp1d
 from lenstronomy.LensModel.lens_model import LensModel
 from lenstronomy.LensModel.Solver.solver4point import Solver4Point
+from copy import deepcopy
 # from lenstronomy.LensModel.QuadOptimizer.optimizer import Optimizer
 # from lenstronomy.LensModel.QuadOptimizer.param_manager import PowerLawParamManager
 
@@ -173,7 +174,7 @@ def align_realization(realization, lens_model_list_macro, redshift_list_macro, k
     return realization, ray_interp_x, ray_interp_y, lens_model, kwargs_lens
 
 def flux_ratio_summary_statistic(normalized_magnifcations_measured, model_magnifications,
-                          measurement_uncertainties, keep_flux_ratio_index=[0, 1, 2], uncertainty_in_fluxes=True):
+                          measurement_uncertainties, keep_flux_ratio_index, uncertainty_in_fluxes):
     """
     Computes the summary statistic corresponding to a set of flux ratios
     :param normalized_magnifcations_measured:
@@ -186,21 +187,22 @@ def flux_ratio_summary_statistic(normalized_magnifcations_measured, model_magnif
     _flux_ratios_data = np.array(normalized_magnifcations_measured[1:]) / normalized_magnifcations_measured[0]
     # account for measurement uncertainties in the measured fluxes or flux ratios
     if uncertainty_in_fluxes:
-        assert len(measurement_uncertainties) == len(model_magnifications)
-        mags_with_uncertainties = []
-        for j, mag in enumerate(model_magnifications):
-            delta_m = np.random.normal(0.0, measurement_uncertainties[j] * mag)
-            m = mag + delta_m
-            mags_with_uncertainties.append(m)
+        if measurement_uncertainties is None:
+            mags_with_uncertainties = np.deepcopy(model_magnifications)
+        else:
+            assert len(measurement_uncertainties) == len(model_magnifications)
+            mags_with_uncertainties = [model_magnifications[j] +
+                                       np.random.normal(0.0, measurement_uncertainties[j]*model_magnifications[j])
+                                       for j in range(0, len(model_magnifications))]
         _flux_ratios = np.array(mags_with_uncertainties)[1:] / mags_with_uncertainties[0]
     else:
-        assert len(measurement_uncertainties) == len(model_magnifications) - 1
         _fr = model_magnifications[1:] / model_magnifications[0]
-        fluxratios_with_uncertainties = []
-        for k, fr in enumerate(_fr):
-            df = np.random.normal(0, fr * measurement_uncertainties[k])
-            new_fr = fr + df
-            fluxratios_with_uncertainties.append(new_fr)
+        if measurement_uncertainties is None:
+            fluxratios_with_uncertainties = deepcopy(_fr)
+        else:
+            assert len(measurement_uncertainties) == len(model_magnifications) - 1
+            fluxratios_with_uncertainties = [_fr[j] + np.random.normal(0.0, _fr[j]*measurement_uncertainties[j])
+                                             for j in range(0, len(_fr))]
         _flux_ratios = np.array(fluxratios_with_uncertainties)
     flux_ratios_data = []
     flux_ratios = []
@@ -215,7 +217,7 @@ def flux_ratio_summary_statistic(normalized_magnifcations_measured, model_magnif
     return stat, flux_ratios, flux_ratios_data
 
 def flux_ratio_likelihood(measured_fluxes, model_fluxes, measurement_uncertainties, uncertainty_in_fluxes,
-                          keep_flux_ratio_index=[0, 1, 2], tolerance=0.03):
+                          keep_flux_ratio_index, tolerance=0.03):
     """
 
     :param measured_fluxes:
