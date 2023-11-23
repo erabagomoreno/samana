@@ -4,7 +4,7 @@ from samana.Data.ImageData.mock_2_simple import image_data
 
 class Mock2Data(MockBase):
 
-    def __init__(self):
+    def __init__(self, super_sample_factor=1.0):
 
         z_lens = 0.4
         z_source = 1.7
@@ -22,4 +22,5 @@ class Mock2Data(MockBase):
         self.delta_phi_m4_true = 0.0
 
         super(Mock2Data, self).__init__(z_lens, z_source, x_image, y_image,
-                                    magnifications, astrometric_uncertainties, flux_ratio_uncertainties, image_data)
+                                    magnifications, astrometric_uncertainties, flux_ratio_uncertainties, image_data,
+                                        super_sample_factor)

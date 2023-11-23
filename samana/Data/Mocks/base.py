@@ -7,8 +7,8 @@ from copy import deepcopy
 class MockBase(ImagingDataBase):
 
     def __init__(self, z_lens, z_source, x_image, y_image, magnifications,
-                 astrometric_uncertainties, flux_ratio_uncertainties, image_data):
-
+                 astrometric_uncertainties, flux_ratio_uncertainties, image_data, super_sample_factor):
+        self._super_sample_factor = super_sample_factor
         # here we specify whether measurement uncertainties are quoted for flux ratios or fluxes
         uncertainty_in_fluxes = False
         # we use all three flux ratios to constrain the model
@@ -50,7 +50,7 @@ class MockBase(ImagingDataBase):
 
     @property
     def kwargs_numerics(self):
-        return {'supersampling_factor': 1,
+        return {'supersampling_factor': int(self._super_sample_factor),
                 'supersampling_convolution': False}
 
     @property

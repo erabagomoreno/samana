@@ -8,7 +8,8 @@ from lenstronomy.Data.coord_transforms import Coordinates
 
 class _WGDJ0405(ImagingDataBase):
 
-    def __init__(self, image_position_uncertainties, flux_uncertainties, magnifications, uncertainty_in_fluxes):
+    def __init__(self, image_position_uncertainties, flux_uncertainties, magnifications,
+                 uncertainty_in_fluxes, supersample_factor):
 
         z_lens = 0.3
         z_source = 1.7
@@ -24,11 +25,11 @@ class _WGDJ0405(ImagingDataBase):
         self._psf_estimate_init = psf_model
         self._psf_error_map_init = psf_error_map
         self._image_data = image_data
+        self._supersample_factor = supersample_factor
         image_band = [self.kwargs_data, self.kwargs_psf, self.kwargs_numerics]
         multi_band_list = [image_band]
         kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear'}
         likelihood_mask, likelihood_mask_imaging_weights = self.likelihood_masks(x_image, y_image)
-
         super(_WGDJ0405, self).__init__(z_lens, z_source,
                                         kwargs_data_joint, x_image, y_image,
                                         magnifications, image_position_uncertainties, flux_uncertainties,
@@ -64,7 +65,7 @@ class _WGDJ0405(ImagingDataBase):
 
     @property
     def kwargs_numerics(self):
-        return {'supersampling_factor': 1,
+        return {'supersampling_factor': int(self._supersample_factor),
                 'supersampling_convolution': False}
 
     @property
@@ -87,23 +88,23 @@ class _WGDJ0405(ImagingDataBase):
 
 class WGDJ0405NarrowLineFluxes(_WGDJ0405):
 
-    def __init__(self):
+    def __init__(self, supersample_factor=1):
 
         image_position_uncertainty = [0.005] * 4 # m.a.s.
         normalized_magnifications = np.array([0.8, 0.52, 1.0, 0.94])
         flux_uncertainties = np.array([0.04, 0.04/0.65, 0.03/1.25, 0.04/1.17])
         uncertainty_in_fluxes = True
         super(WGDJ0405NarrowLineFluxes, self).__init__(image_position_uncertainty, flux_uncertainties, normalized_magnifications,
-                                                       uncertainty_in_fluxes)
+                                                       uncertainty_in_fluxes, supersample_factor)
 
 class WGDJ0405JWST(_WGDJ0405):
 
-    def __init__(self):
+    def __init__(self, supersample_factor=1):
 
         image_position_uncertainty = [0.005] * 4  # m.a.s.
         normalized_magnifications = np.array([1.00, 0.70, 1.07, 1.28])
-        flux_uncertainties = np.array([0.03] * 4)
-        uncertainty_in_fluxes = True
+        flux_uncertainties = np.array([0.03] * 3)
+        uncertainty_in_fluxes = False
         super(WGDJ0405JWST, self).__init__(image_position_uncertainty, flux_uncertainties,
                                                        normalized_magnifications,
-                                                       uncertainty_in_fluxes)
+                                                       uncertainty_in_fluxes, supersample_factor)

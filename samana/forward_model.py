@@ -1,6 +1,6 @@
 from pyHalo.preset_models import preset_model_from_name
 from samana.forward_model_util import filenames, sample_prior, align_realization, \
-    flux_ratio_summary_statistic, flux_ratio_likelihood, check_solution
+    flux_ratio_summary_statistic, flux_ratio_likelihood
 from lenstronomy.LensModel.lens_model import LensModel
 from lenstronomy.Util.magnification_finite_util import auto_raytracing_grid_resolution, auto_raytracing_grid_size
 from lenstronomy.Workflow.fitting_sequence import FittingSequence
@@ -18,7 +18,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                   rescale_grid_size=1.0, rescale_grid_resolution=2.0, readout_macromodel_samples=True,
                   verbose=False, random_seed_init=None, readout_steps=2, write_sampling_rate=True,
                   n_pso_particles=10, n_pso_iterations=50, num_threads=1, astrometric_uncertainty=True,
-                  resample_kwargs_lens=False, kde_sampler=None, test_mode=False):
+                  resample_kwargs_lens=False, kde_sampler=None, image_data_grid_resolution_rescale=1.0, test_mode=False):
     """
 
     :param output_path:
@@ -44,6 +44,8 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
     :param num_threads:
     :param astrometric_uncertainty:
     :param resample_kwargs_lens:
+    :param kde_sampler:
+    :param image_data_grid_resolution_rescale:
     :param test_mode:
     :return:
     """
@@ -114,11 +116,11 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
             random_seed = random_seed - 4294967296
         magnifications, images, realization_samples, source_samples, macromodel_samples, macromodel_samples_fixed, \
         logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, bic, param_names_realization, param_names_source, param_names_macro, \
-        param_names_macro_fixed = forward_model_single_iteration(data_class, model, preset_model_name, kwargs_sample_realization,
+        param_names_macro_fixed, _ = forward_model_single_iteration(data_class, model, preset_model_name, kwargs_sample_realization,
                                             kwargs_sample_source, kwargs_sample_fixed_macromodel, log_mlow_mass_sheets,
-                                            rescale_grid_size, rescale_grid_resolution, verbose, random_seed, n_pso_particles,
-                                           n_pso_iterations, num_threads, astrometric_uncertainty, resample_kwargs_lens,
-                                                                 kde_sampler, test_mode)
+                                            rescale_grid_size, rescale_grid_resolution, image_data_grid_resolution_rescale,
+                                            verbose, random_seed, n_pso_particles, n_pso_iterations, num_threads,
+                                            astrometric_uncertainty, resample_kwargs_lens, kde_sampler, test_mode)
         seed_counter += 1
         acceptance_rate_counter += 1
         # Once we have computed a couple realizations, keep a log of the time it takes to run per realization
@@ -238,7 +240,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
 
 def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_sample_realization,
                             kwargs_sample_source, kwargs_sample_macro_fixed, log_mlow_mass_sheets=6.0, rescale_grid_size=1.0,
-                            rescale_grid_resolution=2.0, verbose=False, seed=None,
+                            rescale_grid_resolution=2.0, image_data_grid_resolution_rescale=1.0, verbose=False, seed=None,
                                    n_pso_particles=10, n_pso_iterations=50, num_threads=1, astrometric_uncertainty=True,
                                    resample_kwargs_lens=False, kde_sampler=None, test_mode=False):
 
@@ -276,7 +278,7 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                                               delta_x_image=-delta_x_image,
                                               delta_y_image=-delta_y_image,
                                               macromodel_samples_fixed=macromodel_samples_fixed_dict)
-    pixel_size = data_class.coordinate_properties[0]
+    pixel_size = data_class.coordinate_properties[0] / data_class.kwargs_numerics['supersampling_factor']
     kwargs_model_align, _, _, _ = model_class.setup_kwargs_model(
         decoupled_multiplane=False,
         macromodel_samples_fixed=macromodel_samples_fixed_dict)
@@ -289,10 +291,10 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         kwargs_mass_sheet={'log_mlow_sheets': log_mlow_mass_sheets})
     if verbose:
         print('realization has '+str(len(realization.halos))+' halos')
-
+    grid_resolution_image_data = pixel_size * image_data_grid_resolution_rescale
     kwargs_model, lens_model_init, kwargs_lens_init, index_lens_split = model_class.setup_kwargs_model(decoupled_multiplane=True,
                                                                                lens_model_list_halos=lens_model_list_halos,
-                                                                               grid_resolution=pixel_size,
+                                                                               grid_resolution=grid_resolution_image_data,
                                                                                redshift_list_halos=list(redshift_list_halos),
                                                                                kwargs_halos=kwargs_halos,
                                                                                      verbose=verbose,
@@ -397,6 +399,10 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         print('flux_ratio_likelihood_weight', flux_ratio_likelihood_weight)
         print('BIC: ', bic)
 
+    kwargs_model_plot = {'multi_band_list': data_class.kwargs_data_joint['multi_band_list'],
+                         'kwargs_model': kwargs_model,
+                         'kwargs_params': kwargs_result}
+
     if test_mode:
         from lenstronomy.Plots.model_plot import ModelPlot
         from lenstronomy.Plots import chain_plot
@@ -413,8 +419,8 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
             ax.annotate('magnification: '+str(np.round(mag,1)), xy=(0.3,0.9),
                         xycoords='axes fraction',color='w',fontsize=12)
         plt.show()
-        multi_band_list = data_class.kwargs_data_joint['multi_band_list']
-        modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",
+        modelPlot = ModelPlot(data_class.kwargs_data_joint['multi_band_list'],
+                              kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",
                               fast_caustic=True, image_likelihood_mask_list=[data_class.likelihood_mask_imaging_weights])
         chain_plot.plot_chain_list(chain_list, 0)
         f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
@@ -443,11 +449,12 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         kwargs_plot = {'ax': ax,
                        'index_macromodel': list(np.arange(0, len(kwargs_result['kwargs_lens']))),
                        'with_critical_curves': True,
-                       'v_min': -0.1, 'v_max': 0.1}
+                       'v_min': -0.1, 'v_max': 0.1,
+                       'super_sample_factor': 5}
         modelPlot.substructure_plot(band_index=0, **kwargs_plot)
         plt.show()
         a=input('continue')
 
     return magnifications, images, realization_samples, source_samples, samples_macromodel, samples_macromodel_fixed, \
            logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, bic, realization_param_names, source_param_names, param_names_macro, \
-           param_names_macro_fixed
+           param_names_macro_fixed, kwargs_model_plot
