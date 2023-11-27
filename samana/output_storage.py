@@ -1,7 +1,6 @@
 import numpy as np
 from lenstronomy.Util.param_util import shear_cartesian2polar
 from lenstronomy.Util.param_util import ellipticity2phi_q
-from samana.image_magnification_util import perturbed_flux_ratios_from_fluxes
 from copy import deepcopy
 
 class Output(object):

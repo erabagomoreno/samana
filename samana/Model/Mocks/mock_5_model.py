@@ -30,7 +30,7 @@ class Mock5Model(MockModelBase):
                               'e2': 0.12626665005177207, 'gamma': 2.1367585524167274,
                               'a4_a': 0.003715905688783965, 'a3_a': -0.0014697990179525606,
                               'delta_phi_m3': -0.2911280704507563, 'delta_phi_m4': 0.0},
-                             {'gamma1': -0.06, 'gamma2': -0.04}]
+                             {'gamma1': 0.1, 'gamma2': -0.05}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1]
         if kwargs_lens_macro_init is not None:
