@@ -32,6 +32,19 @@ class MockBase(ImagingDataBase):
                                         uncertainty_in_fluxes, keep_flux_ratio_index, likelihood_mask,
                                         likelihood_mask_imaging_weights)
 
+    def perturb_flux_measurements(self, measurement_uncertainties):
+        """
+
+        :param measurement_uncertainties:
+        :param uncertainty_in_flux_ratios:
+        :return:
+        """
+        magnifications = []
+        for i in range(0, len(self.magnifications)):
+            dm = self.magnifications[i] * measurement_uncertainties[i]
+            magnifications.append(self.magnifications[i] + np.random.normal(0.0, dm))
+        self.magnifications = np.round(magnifications, 4)
+
     def likelihood_masks(self, x_image, y_image, image_data):
 
         deltaPix, ra_at_xy_0, dec_at_xy_0, transform_pix2angle, window_size = self.coordinate_properties

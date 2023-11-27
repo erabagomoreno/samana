@@ -1,7 +1,8 @@
 import numpy as np
 from lenstronomy.Util.param_util import shear_cartesian2polar
 from lenstronomy.Util.param_util import ellipticity2phi_q
-
+from samana.image_magnification_util import perturbed_flux_ratios_from_fluxes
+from copy import deepcopy
 
 class Output(object):
 
@@ -22,8 +23,8 @@ class Output(object):
         self.fitting_kwargs_list = fitting_kwargs_list
         self.seed = parameters[:, -1]
         self.image_data_logL = parameters[:, -2]
-        self.flux_ratio_likelihood = parameters[:, -3]
-        self.flux_ratio_stat = parameters[:, -4]
+        self._flux_ratio_likelihood = deepcopy(parameters[:, -3])
+        self._flux_ratio_stat = deepcopy(parameters[:, -4])
         self._param_dict = None
         self._param_names = param_names
         self._macromodel_sample_names = macromodel_sample_names
@@ -38,6 +39,53 @@ class Output(object):
             self._macromodel_samples_dict = {}
             for i, name in enumerate(macromodel_sample_names):
                 self._macromodel_samples_dict[name] = macromodel_samples[:, i]
+    @classmethod
+    def join(self, output1, output2):
+
+        params = np.vstack((output1.parameters, output2.parameters))
+        mags = np.vstack((output1.image_magnifications, output2.image_magnifications))
+        macro_samples = np.vstack((output1.macromodel_samples, output2.macromodel_samples))
+        #fitting_kwargs = output1.fitting_kwargs_list + output2.fitting_kwargs_list
+        param_names = output1._param_names
+        macromodel_sample_names = output1._macromodel_sample_names
+        return Output(params, mags, macro_samples, None, param_names, macromodel_sample_names)
+
+
+    @property
+    def flux_ratio_likelihood(self):
+        """
+
+        :return:
+        """
+        return self._flux_ratio_likelihood
+
+    @property
+    def flux_ratio_summary_statistic(self):
+        """
+
+        :return:
+        """
+        return self._flux_ratio_stat
+
+    def set_flux_ratio_likelihood(self, measured_magnifications, modeled_magnifications, measurement_uncertainties):
+
+        measured_flux_ratios = measured_magnifications[1:] / measured_magnifications[0]
+        modeled_flux_ratios = modeled_magnifications[:, 1:] / modeled_magnifications[:, 0, np.newaxis]
+        like = 0
+        for i in range(0, 3):
+            like += (measured_flux_ratios[i] - modeled_flux_ratios[:, i]) ** 2 / measurement_uncertainties[i] ** 2
+        flux_ratio_likelihood = np.exp(-0.5 * like)
+        norm = np.max(flux_ratio_likelihood)
+        self._flux_ratio_likelihood = flux_ratio_likelihood / norm
+
+    def set_flux_ratio_summary_statistic(self, measured_magnifications, modeled_magnifications):
+
+        measured_flux_ratios = measured_magnifications[1:] / measured_magnifications[0]
+        modeled_flux_ratios = modeled_magnifications[:,1:] / modeled_magnifications[:,0,np.newaxis]
+        stat = 0
+        for i in range(0, 3):
+            stat += (measured_flux_ratios[i] - modeled_flux_ratios[:,i])**2
+        self._flux_ratio_stat = np.sqrt(stat)
 
     @property
     def flux_ratios(self):
@@ -204,7 +252,7 @@ class Output(object):
         :param percentile_cut:
         :return:
         """
-        sorted_inds = np.argsort(self.flux_ratio_stat)
+        sorted_inds = np.argsort(self.flux_ratio_summary_statistic)
         if keep_best_N is not None:
             assert percentile_cut is None and S_statistic_cut is None
             inds_keep = sorted_inds[0:keep_best_N]
@@ -213,7 +261,7 @@ class Output(object):
             idxcut = int(self.parameters.shape[0] * percentile_cut/100)
             inds_keep = sorted_inds[0:idxcut]
         elif S_statistic_cut is not None:
-            inds_keep = np.where(self.flux_ratio_stat <= S_statistic_cut)[0]
+            inds_keep = np.where(self.flux_ratio_summary_statistic <= S_statistic_cut)[0]
         else:
             raise Exception('must specify keep_best_N, percentile_cut, or S_statistic_cut')
         return self._subsample(inds_keep)

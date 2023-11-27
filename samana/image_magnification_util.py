@@ -2,6 +2,43 @@ from lenstronomy.LensModel.Util.decouple_multi_plane_util import setup_grids, co
 import numpy as np
 from lenstronomy.LightModel.light_model import LightModel
 
+def perturbed_flux_ratios_from_fluxes(fluxes, flux_measurement_uncertainties_percentage):
+    """
+
+    :param fluxes:
+    :param flux_measurement_uncertainties_percentage:
+    :return:
+    """
+    fluxes_perturbed = perturbed_fluxes_from_fluxes(fluxes, flux_measurement_uncertainties_percentage)
+    fluxes = np.array(fluxes)
+    if fluxes.ndim == 1:
+        flux_ratios = fluxes_perturbed[1:] / fluxes_perturbed[0]
+    else:
+        flux_ratios = fluxes_perturbed[:, 1:] / fluxes_perturbed[:,0,np.newaxis]
+    return flux_ratios
+
+def perturbed_fluxes_from_fluxes(fluxes, flux_measurement_uncertainties_percentage):
+    """
+
+    :param fluxes:
+    :param flux_measurement_uncertainties_percentage:
+    :return:
+    """
+    fluxes = np.array(fluxes)
+    if fluxes.ndim == 1:
+        fluxes_perturbed = []
+        for i in range(0, 4):
+            df = np.random.normal(0.0, fluxes[i] * flux_measurement_uncertainties_percentage[i])
+            fluxes_perturbed.append(fluxes[i] + df)
+        fluxes_perturbed = np.array(fluxes_perturbed)
+    else:
+        fluxes_perturbed = np.empty_like(fluxes)
+        for i in range(0, 4):
+            df = np.random.normal(0.0, fluxes[:, i] * flux_measurement_uncertainties_percentage[i])
+            fluxes_perturbed[:, i] = fluxes[:, i] + df
+    return fluxes_perturbed
+
+
 def magnification_finite_decoupled(source_model, kwargs_source, x_image, y_image,
                                    lens_model_init, kwargs_lens_init, kwargs_lens, index_lens_split,
                                    grid_size, grid_resolution, r_step_factor=10.0):
