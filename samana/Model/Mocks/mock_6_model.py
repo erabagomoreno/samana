@@ -9,9 +9,9 @@ class Mock6Model(MockModelBase):
 
     def setup_source_light_model(self):
         source_model_list = ['SERSIC_ELLIPSE']
-        kwargs_source_init = [{'amp': 60.0, 'center_x': -0.0, 'center_y': -0.0, 'e1': 0.05,
-                  'e2': -0.2, 'R_sersic': 0.0475, 'n_sersic': 3.6}]
-        kwargs_source_sigma = [{'amp': 10.0, 'R_sersic': 0.05, 'n_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1,
+        kwargs_source_init = [{'amp': 34.0, 'center_x': -0.0, 'center_y': -0.0, 'e1': 0.05,
+                  'e2': -0.2, 'R_sersic': 0.04, 'n_sersic': 4.0}]
+        kwargs_source_sigma = [{'amp': 5.0, 'R_sersic': 0.05, 'n_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1,
                                 'center_y': 0.1}]
         kwargs_lower_source = [
             {'R_sersic': 0.001, 'n_sersic': 0.5, 'e1': -0.5, 'e2': -0.5, 'center_x': -10, 'center_y': -10.0}]
@@ -30,7 +30,7 @@ class Mock6Model(MockModelBase):
                               'e2': 0.24238190469213294, 'gamma': 1.820435657084285,
                               'a4_a': -0.005256260448144398, 'a3_a': 0.005024586292580997,
                               'delta_phi_m3': 0.41140218854650545, 'delta_phi_m4': 0.0},
-                             {'gamma1': -0.04, 'gamma2': 0.02}]
+                             {'gamma1': -0.02, 'gamma2': 0.04}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1]
         if kwargs_lens_macro_init is not None:
