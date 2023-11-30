@@ -191,7 +191,7 @@ class Output(object):
                 parameters = np.vstack((parameters, params))
                 magnifications = np.vstack((magnifications, fluxes))
                 macromodel_samples = np.vstack((macromodel_samples, macrosamples))
-
+        print('compiled '+str(parameters.shape[0])+' realizations.')
         return Output(parameters, magnifications, macromodel_samples, fitting_kwargs_list,
                  param_names, macromodel_sample_names)
 
