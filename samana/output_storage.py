@@ -66,6 +66,11 @@ class Output(object):
         """
         return self._flux_ratio_stat
 
+    @property
+    def imaging_data_relative_likelihood(self):
+        imaging_data_weights = np.exp(self.image_data_logL - np.max(self.image_data_logL))
+        return imaging_data_weights
+
     def set_flux_ratio_likelihood(self, measured_magnifications, modeled_magnifications, measurement_uncertainties):
 
         measured_flux_ratios = measured_magnifications[1:] / measured_magnifications[0]

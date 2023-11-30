@@ -6,17 +6,17 @@ class Mock6Data(MockBase):
 
     def __init__(self, super_sample_factor=1.0):
 
-        z_lens = 0.55
-        z_source = 2.6
-        x_image = [ 0.62623824, -0.23244766,  0.7292022 , -0.80853096]
-        y_image = [-0.91953787,  0.97866734,  0.62435675, -0.30273136]
-        magnifications_true = [4.07148687, 4.354839  , 3.40278675, 2.3364734 ]
+        z_lens = 0.3
+        z_source = 1.6
+        x_image = [ 0.51425757, -0.53602578, -0.74904253,  0.68241391]
+        y_image = [-1.00447728,  0.92292458, -0.38746628,  0.47857275]
+        magnifications_true = [3.66949542, 4.08239418, 2.55090467, 2.46385224]
         magnification_measurement_errors = 0.0
         magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
         astrometric_uncertainties = [0.003] * 4
         flux_ratio_uncertainties = None
 
-        self.a3a_true = 0.00502
+        self.a3a_true = 0.00502458
         self.a4a_true = -0.005256
         self.delta_phi_m3_true = 0.411402
         self.delta_phi_m4_true = 0.0
