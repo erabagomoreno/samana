@@ -1,6 +1,6 @@
 import numpy as np
 from samana.Data.Mocks.base import MockBase
-from samana.Data.ImageData.mock_6_simple import image_data
+from samana.Data.ImageData.mock_8_simple import image_data
 
 class Mock8Data(MockBase):
 
