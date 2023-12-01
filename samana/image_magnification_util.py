@@ -1,6 +1,26 @@
 from lenstronomy.LensModel.Util.decouple_multi_plane_util import setup_grids, coordinates_and_deflections, setup_lens_model
 import numpy as np
 from lenstronomy.LightModel.light_model import LightModel
+from copy import deepcopy
+
+def perturbed_flux_ratios_from_flux_ratios(flux_ratios, flux_ratio_measurement_uncertainties_percentage):
+    """
+
+    :param flux_ratios:
+    :param flux_ratio_measurement_uncertainties_percentage:
+    :return:
+    """
+    if flux_ratios.ndim == 1:
+        flux_ratios_perturbed = [np.random.normal(flux_ratios[i],
+                                        flux_ratios[i] *
+                                        flux_ratio_measurement_uncertainties_percentage[i]) for i in range(0, 3)]
+    else:
+        flux_ratios_perturbed = deepcopy(flux_ratios)
+        for i in range(0,3):
+            flux_ratios_perturbed[:, i] += np.random.normal(0.0,
+                                                            flux_ratios_perturbed[:, i] *
+                                                            flux_ratio_measurement_uncertainties_percentage[i])
+    return np.array(flux_ratios_perturbed)
 
 def perturbed_flux_ratios_from_fluxes(fluxes, flux_measurement_uncertainties_percentage):
     """

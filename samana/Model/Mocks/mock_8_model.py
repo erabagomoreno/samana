@@ -29,7 +29,7 @@ class Mock8Model(MockModelBase):
         kwargs_lens_macro = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.003217299791470716,
                               'e2': -0.022608223914894157, 'gamma': 2.0573463026292904, 'a4_a': 0.0018056599088162486,
                               'a3_a': -0.00782030346109874, 'delta_phi_m3': 0.3910543561483979, 'delta_phi_m4': 0.0},
-                             {'gamma1': -0.0, 'gamma2': 0.075}]
+                             {'gamma1': -0.0, 'gamma2': 0.065}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1]
         if kwargs_lens_macro_init is not None:

@@ -38,6 +38,7 @@ class Output(object):
             self._macromodel_samples_dict = {}
             for i, name in enumerate(macromodel_sample_names):
                 self._macromodel_samples_dict[name] = macromodel_samples[:, i]
+
     @classmethod
     def join(self, output1, output2):
 
@@ -48,7 +49,6 @@ class Output(object):
         param_names = output1._param_names
         macromodel_sample_names = output1._macromodel_sample_names
         return Output(params, mags, macro_samples, None, param_names, macromodel_sample_names)
-
 
     @property
     def flux_ratio_likelihood(self):
@@ -71,10 +71,16 @@ class Output(object):
         imaging_data_weights = np.exp(self.image_data_logL - np.max(self.image_data_logL))
         return imaging_data_weights
 
-    def set_flux_ratio_likelihood(self, measured_magnifications, modeled_magnifications, measurement_uncertainties):
+    def set_flux_ratio_likelihood(self, measured_magnifications=None,
+                                  modeled_magnifications=None,
+                                  measurement_uncertainties=None,
+                                  measured_flux_ratios=None,
+                                  modeled_flux_ratios=None):
 
-        measured_flux_ratios = measured_magnifications[1:] / measured_magnifications[0]
-        modeled_flux_ratios = modeled_magnifications[:, 1:] / modeled_magnifications[:, 0, np.newaxis]
+        if measured_flux_ratios is None:
+            measured_flux_ratios = measured_magnifications[1:] / measured_magnifications[0]
+        if modeled_flux_ratios is None:
+            modeled_flux_ratios = modeled_magnifications[:,1:] / modeled_magnifications[:,0,np.newaxis]
         like = 0
         for i in range(0, 3):
             like += (measured_flux_ratios[i] - modeled_flux_ratios[:, i]) ** 2 / measurement_uncertainties[i] ** 2
@@ -82,10 +88,13 @@ class Output(object):
         norm = np.max(flux_ratio_likelihood)
         self._flux_ratio_likelihood = flux_ratio_likelihood / norm
 
-    def set_flux_ratio_summary_statistic(self, measured_magnifications, modeled_magnifications):
+    def set_flux_ratio_summary_statistic(self, measured_magnifications, modeled_magnifications,
+                                         measured_flux_ratios=None, modeled_flux_ratios=None):
 
-        measured_flux_ratios = measured_magnifications[1:] / measured_magnifications[0]
-        modeled_flux_ratios = modeled_magnifications[:,1:] / modeled_magnifications[:,0,np.newaxis]
+        if measured_flux_ratios is None:
+            measured_flux_ratios = measured_magnifications[1:] / measured_magnifications[0]
+        if modeled_flux_ratios is None:
+            modeled_flux_ratios = modeled_magnifications[:,1:] / modeled_magnifications[:,0,np.newaxis]
         stat = 0
         for i in range(0, 3):
             stat += (measured_flux_ratios[i] - modeled_flux_ratios[:,i])**2

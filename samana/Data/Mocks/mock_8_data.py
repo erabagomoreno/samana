@@ -6,11 +6,11 @@ class Mock8Data(MockBase):
 
     def __init__(self, super_sample_factor=1.0):
 
-        z_lens = 0.3
-        z_source = 0.9
-        x_image = [ 0.78299232, -0.76274888, -0.79047552,  0.44990524]
-        y_image = [ 0.80338065, -0.70578691,  0.4880058 , -0.80951851]
-        magnifications_true = [4.97427634, 7.10939417, 5.05693453, 5.23806595]
+        z_lens = 0.5
+        z_source = 1.6
+        x_image = [-0.89373101,  0.63411634, -0.62676762,  0.65904621]
+        y_image = [-0.62638899,  0.85352402,  0.73662769, -0.63904648]
+        magnifications_true = [5.72468493, 7.90861551, 6.8862955 , 4.50563578]
         magnification_measurement_errors = 0.0
         magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
         astrometric_uncertainties = [0.003] * 4
