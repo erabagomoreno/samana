@@ -6,7 +6,8 @@ from copy import deepcopy
 class Output(object):
 
     def __init__(self, parameters, image_magnifications, macromodel_samples, fitting_kwargs_list=None,
-                 param_names=None, macromodel_sample_names=None):
+                 param_names=None, macromodel_sample_names=None, flux_ratio_summary_statistic=None,
+                 flux_ratio_likelihood=None):
         """
 
         :param param_names:
@@ -22,8 +23,14 @@ class Output(object):
         self.fitting_kwargs_list = fitting_kwargs_list
         self.seed = parameters[:, -1]
         self.image_data_logL = parameters[:, -2]
-        self._flux_ratio_likelihood = deepcopy(parameters[:, -3])
-        self._flux_ratio_stat = deepcopy(parameters[:, -4])
+        if flux_ratio_likelihood is None:
+            self._flux_ratio_likelihood = deepcopy(parameters[:, -3])
+        else:
+            self._flux_ratio_likelihood = flux_ratio_likelihood
+        if flux_ratio_summary_statistic is None:
+            self._flux_ratio_stat = deepcopy(parameters[:, -4])
+        else:
+            self._flux_ratio_stat = flux_ratio_summary_statistic
         self._param_dict = None
         self._param_names = param_names
         self._macromodel_sample_names = macromodel_sample_names
@@ -45,10 +52,14 @@ class Output(object):
         params = np.vstack((output1.parameters, output2.parameters))
         mags = np.vstack((output1.image_magnifications, output2.image_magnifications))
         macro_samples = np.vstack((output1.macromodel_samples, output2.macromodel_samples))
-        #fitting_kwargs = output1.fitting_kwargs_list + output2.fitting_kwargs_list
         param_names = output1._param_names
         macromodel_sample_names = output1._macromodel_sample_names
-        return Output(params, mags, macro_samples, None, param_names, macromodel_sample_names)
+        flux_ratio_summary_statistic = np.append(output1.flux_ratio_summary_statistic,
+                                                 output2.flux_ratio_summary_statistic)
+        flux_ratio_likelihood = np.append(output1.flux_ratio_likelihood,
+                                                 output2.flux_ratio_likelihood)
+        return Output(params, mags, macro_samples, None, param_names, macromodel_sample_names,
+                      flux_ratio_summary_statistic, flux_ratio_likelihood)
 
     @property
     def flux_ratio_likelihood(self):
@@ -56,7 +67,11 @@ class Output(object):
 
         :return:
         """
-        return self._flux_ratio_likelihood
+        if self._flux_ratio_likelihood is None:
+            print('flux ratio likelihood not set!')
+            return None
+        else:
+            return self._flux_ratio_likelihood
 
     @property
     def flux_ratio_summary_statistic(self):
@@ -64,7 +79,11 @@ class Output(object):
 
         :return:
         """
-        return self._flux_ratio_stat
+        if self._flux_ratio_stat is None:
+            print('flux ratio summary statistic not set!')
+            return None
+        else:
+            return self._flux_ratio_stat
 
     @property
     def imaging_data_relative_likelihood(self):
@@ -75,7 +94,8 @@ class Output(object):
                                   modeled_magnifications=None,
                                   measurement_uncertainties=None,
                                   measured_flux_ratios=None,
-                                  modeled_flux_ratios=None):
+                                  modeled_flux_ratios=None,
+                                  verbose=False):
 
         if measured_flux_ratios is None:
             measured_flux_ratios = measured_magnifications[1:] / measured_magnifications[0]
@@ -87,9 +107,11 @@ class Output(object):
         flux_ratio_likelihood = np.exp(-0.5 * like)
         norm = np.max(flux_ratio_likelihood)
         self._flux_ratio_likelihood = flux_ratio_likelihood / norm
+        if verbose:
+            print('flux ratio likelihood effective sample size: ', np.sum(self._flux_ratio_likelihood))
 
     def set_flux_ratio_summary_statistic(self, measured_magnifications, modeled_magnifications,
-                                         measured_flux_ratios=None, modeled_flux_ratios=None):
+                                         measured_flux_ratios=None, modeled_flux_ratios=None, verbose=False):
 
         if measured_flux_ratios is None:
             measured_flux_ratios = measured_magnifications[1:] / measured_magnifications[0]
@@ -99,6 +121,12 @@ class Output(object):
         for i in range(0, 3):
             stat += (measured_flux_ratios[i] - modeled_flux_ratios[:,i])**2
         self._flux_ratio_stat = np.sqrt(stat)
+        if verbose:
+            print('SUMMARY STATISTIC THRESHOLDS: ')
+            print('S = 0.02: ', np.sum(self._flux_ratio_stat < 0.02))
+            print('S = 0.05: ', np.sum(self._flux_ratio_stat < 0.05))
+            print('S = 0.075: ', np.sum(self._flux_ratio_stat < 0.075))
+            print('S = 0.1: ', np.sum(self._flux_ratio_stat < 0.1))
 
     @property
     def flux_ratios(self):
@@ -242,10 +270,14 @@ class Output(object):
         parameters = self.parameters[inds_keep, :]
         image_magnifications = self.image_magnifications[inds_keep, :]
         macromodel_samples = self.macromodel_samples[inds_keep, :]
+        flux_ratio_summary_statistic = self.flux_ratio_summary_statistic[inds_keep]
+        flux_ratio_likelihood = self.flux_ratio_likelihood[inds_keep]
         return Output(parameters, image_magnifications, macromodel_samples,
                       fitting_kwargs_list=self.fitting_kwargs_list,
                       param_names=self._param_names,
-                      macromodel_sample_names=self._macromodel_sample_names)
+                      macromodel_sample_names=self._macromodel_sample_names,
+                      flux_ratio_summary_statistic=flux_ratio_summary_statistic,
+                      flux_ratio_likelihood=flux_ratio_likelihood)
 
     def cut_on_image_data(self, percentile_cut):
         """

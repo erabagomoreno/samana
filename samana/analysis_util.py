@@ -2,6 +2,7 @@ import numpy as np
 from copy import deepcopy
 from lenstronomy.Workflow.fitting_sequence import FittingSequence
 from samana.image_magnification_util import perturbed_fluxes_from_fluxes, perturbed_flux_ratios_from_flux_ratios
+from samana.output_storage import Output
 
 def nmax_bic_minimize(data, model_class, fitting_kwargs_list, n_max_list, verbose=True):
     """
@@ -46,7 +47,9 @@ def cut_on_data(output, data,
                 percentile_cut_image_data=None,
                 n_keep_S_statistic=None,
                 S_statistic_tolerance=None,
-                perturb_measurements=True):
+                perturb_measurements=True,
+                perturb_model=True,
+                verbose=False):
     """
 
     :param output:
@@ -68,38 +71,46 @@ def cut_on_data(output, data,
         percentile_cut_image_data = 100.0 # keep everything
 
     if uncertainty_in_flux_ratios:
+        mags_measured = data_class.magnifications
+        _flux_ratios_measured = mags_measured[1:] / mags_measured[0]
         if flux_ratio_uncertainty_percentage is None:
-            model_flux_ratios = output.flux_ratios
-            flux_ratios_measured = data_class.magnifications[1:]/data_class.magnifications[0]
-        else:
-            mags_measured = data_class.magnifications
-            _flux_ratios_measured = mags_measured[1:]/mags_measured[0]
+            flux_ratios_measured = data_class.magnifications[1:] / data_class.magnifications[0]
+        elif perturb_measurements:
             delta_f = np.array(flux_ratio_uncertainty_percentage) * np.array(_flux_ratios_measured)
-            if perturb_measurements:
-                flux_ratios_measured = [np.random.normal(_flux_ratios_measured[i], delta_f[i]) for i in range(0,3)]
-            else:
-                flux_ratios_measured = _flux_ratios_measured
-            model_flux_ratios = perturbed_flux_ratios_from_flux_ratios(output.flux_ratios,
-                                                                       flux_ratio_uncertainty_percentage)
-        if ABC_flux_ratio_likelihood:
-            __out.set_flux_ratio_summary_statistic(None,
-                                                 None,
-                                                 measured_flux_ratios=flux_ratios_measured,
-                                                 modeled_flux_ratios=model_flux_ratios)
+            flux_ratios_measured = [np.random.normal(_flux_ratios_measured[i], delta_f[i]) for i in range(0, 3)]
         else:
+            flux_ratios_measured = _flux_ratios_measured
+        if ABC_flux_ratio_likelihood:
+            if perturb_model:
+                if flux_ratio_uncertainty_percentage is None:
+                    model_flux_ratios = __out.flux_ratios
+                else:
+                    model_flux_ratios = perturbed_flux_ratios_from_flux_ratios(__out.flux_ratios,
+                                                                           flux_ratio_uncertainty_percentage)
+            else:
+                model_flux_ratios = __out.flux_ratios
+            __out.set_flux_ratio_summary_statistic(None,
+                                                   None,
+                                                   measured_flux_ratios=flux_ratios_measured,
+                                                   modeled_flux_ratios=model_flux_ratios,
+                                                   verbose=verbose)
+
+        else:
+            model_flux_ratios = __out.flux_ratios
             __out.set_flux_ratio_likelihood(None,
-                                          None,
-                                          flux_ratio_uncertainty_percentage,
-                                          measured_flux_ratios=flux_ratios_measured,
-                                          modeled_flux_ratios=model_flux_ratios)
+                                            None,
+                                            flux_ratio_uncertainty_percentage,
+                                            measured_flux_ratios=flux_ratios_measured,
+                                            modeled_flux_ratios=model_flux_ratios,
+                                            verbose=verbose)
 
     else:
         if flux_uncertainty_percentage is None:
-            model_image_magnifications = output.image_magnifications
+            model_image_magnifications = __out.image_magnifications
         else:
             if perturb_measurements:
                 data_class.perturb_flux_measurements(flux_uncertainty_percentage)
-            model_image_magnifications = perturbed_fluxes_from_fluxes(output.image_magnifications,
+            model_image_magnifications = perturbed_fluxes_from_fluxes(__out.image_magnifications,
                                                                       flux_uncertainty_percentage)
 
         observed_image_magnifications = data_class.magnifications
@@ -123,7 +134,7 @@ def cut_on_data(output, data,
     else:
         n_keep_S_statistic = -1
         out_cut_S = _out.cut_on_S_statistic(keep_best_N=n_keep_S_statistic)
-        weights_flux_ratios = out_cut_S.flux_ratio_weights
+        weights_flux_ratios = out_cut_S.flux_ratio_likelihood
 
     if imaging_data_likelihood:
         assert imaging_data_hard_cut is False
@@ -139,16 +150,16 @@ def simulation_output_to_density(output, data, param_names_plot, kwargs_cut_on_d
     out, weights = cut_on_data(output, data, **kwargs_cut_on_data)
     for i in range(0, n_resample):
         _out, _weights = cut_on_data(output, data, **kwargs_cut_on_data)
-        out = out.join(_out)
+        out = Output.join(out, _out)
         weights = np.append(weights, _weights)
 
     samples = out.parameter_array(param_names_plot)
-    param_names = param_names_plot
     if param_names_macro_plot is not None:
         samples_macro = out.macromodel_parameter_array(param_names_macro_plot)
         samples = np.hstack((samples, samples_macro))
-        param_names += param_names_macro_plot
-
+        param_names = param_names_plot + param_names_macro_plot
+    else:
+        param_names = param_names_plot
     from trikde.pdfs import DensitySamples
     density = DensitySamples(samples, param_names, [weights], **kwargs_density)
-    return density
+    return density, out, weights
