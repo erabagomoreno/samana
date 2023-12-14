@@ -8,6 +8,22 @@ class MockModelBase(ModelBase):
         self._shapelets_order = shapelets_order
         super(MockModelBase, self).__init__(data_class, kde_sampler)
 
+    @staticmethod
+    def _add_source_shapelets(n_max, model_list, source_params):
+
+        kwargs_source_init = [{'amp': 1.0, 'beta': 0.1, 'center_x': 0.0, 'center_y': 0.0, 'n_max': n_max}]
+        kwargs_source_sigma = [{'amp': 100.0, 'beta': 0.05, 'center_x': 0.1, 'center_y': 0.1, 'n_max': 1}]
+        kwargs_lower_source = [{'amp': 0.0, 'beta': 0.0, 'center_x': -10.0, 'center_y': -10.0, 'n_max': 1}]
+        kwargs_upper_source = [{'amp': 10000.0, 'beta': 1.0, 'center_x': 10.0, 'center_y': 10.0, 'n_max': 10}]
+        kwargs_source_fixed = [{'n_max': n_max}]
+        model_list += ['SHAPELETS']
+        source_params[0] += kwargs_source_init
+        source_params[1] += kwargs_source_sigma
+        source_params[2] += kwargs_source_fixed
+        source_params[3] += kwargs_lower_source
+        source_params[4] += kwargs_upper_source
+        return model_list, source_params
+
     @property
     def prior_lens(self):
         return [[0, 'gamma', 2.0, 0.2], [0, 'a4_a', 0.0, 0.01], [0, 'a3_a', 0.0, 0.005]]

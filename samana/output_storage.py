@@ -21,30 +21,42 @@ class Output(object):
         self.image_magnifications = image_magnifications
         self.macromodel_samples = macromodel_samples
         self.fitting_kwargs_list = fitting_kwargs_list
-        self.seed = parameters[:, -1]
-        self.image_data_logL = parameters[:, -2]
-        if flux_ratio_likelihood is None:
-            self._flux_ratio_likelihood = deepcopy(parameters[:, -3])
+        if parameters is not None:
+            self.seed = parameters[:, -1]
+            self.image_data_logL = parameters[:, -2]
+            if flux_ratio_likelihood is None:
+                self._flux_ratio_likelihood = deepcopy(parameters[:, -3])
+            else:
+                self._flux_ratio_likelihood = flux_ratio_likelihood
+            if flux_ratio_summary_statistic is None:
+                self._flux_ratio_stat = deepcopy(parameters[:, -4])
+            else:
+                self._flux_ratio_stat = flux_ratio_summary_statistic
         else:
+            self.seed = None
+            self.image_data_logL = None
             self._flux_ratio_likelihood = flux_ratio_likelihood
-        if flux_ratio_summary_statistic is None:
-            self._flux_ratio_stat = deepcopy(parameters[:, -4])
-        else:
             self._flux_ratio_stat = flux_ratio_summary_statistic
         self._param_dict = None
         self._param_names = param_names
         self._macromodel_sample_names = macromodel_sample_names
         if param_names is not None:
-            assert len(param_names) == parameters.shape[1]
-            self._param_dict = {}
-            for i, name in enumerate(param_names):
-                self._param_dict[name] = parameters[:, i]
+            if parameters is not None:
+                assert len(param_names) == parameters.shape[1]
+                self._param_dict = {}
+                for i, name in enumerate(param_names):
+                    self._param_dict[name] = parameters[:, i]
+            else:
+                self._param_dict = {}
         self._macromodel_samples_dict = None
         if macromodel_sample_names is not None:
-            assert len(macromodel_sample_names) == macromodel_samples.shape[1]
-            self._macromodel_samples_dict = {}
-            for i, name in enumerate(macromodel_sample_names):
-                self._macromodel_samples_dict[name] = macromodel_samples[:, i]
+            if macromodel_samples is not None:
+                assert len(macromodel_sample_names) == macromodel_samples.shape[1]
+                self._macromodel_samples_dict = {}
+                for i, name in enumerate(macromodel_sample_names):
+                    self._macromodel_samples_dict[name] = macromodel_samples[:, i]
+            else:
+                self._macromodel_samples_dict = None
 
     @classmethod
     def join(self, output1, output2):
@@ -157,7 +169,7 @@ class Output(object):
         if 'gamma_ext' in param_names or 'phi_gamma' in param_names:
             phi_gamma, gamma_ext = shear_cartesian2polar(self.macromodel_samples_dict['gamma1'],
                                                          self.macromodel_samples_dict['gamma2'])
-        samples = np.empty((self.parameters.shape[0], len(param_names)))
+        samples = np.empty((self.macromodel_samples.shape[0], len(param_names)))
         for i, param_name in enumerate(param_names):
             if param_name == 'q':
                 samples[:, i] = q

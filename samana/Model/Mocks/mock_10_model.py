@@ -3,10 +3,6 @@ import numpy as np
 
 class Mock10Model(MockModelBase):
 
-    def __init__(self, data_class, kde_sampler=None, shapelets_order=None):
-        self._shapelets_order = shapelets_order
-        super(Mock10Model, self).__init__(data_class, kde_sampler)
-
     def setup_source_light_model(self):
         source_model_list = ['SERSIC_ELLIPSE']
         kwargs_source_init = [{'amp': 19.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.07,
@@ -20,6 +16,9 @@ class Mock10Model(MockModelBase):
         kwargs_source_fixed = [{}]
         source_params = [kwargs_source_init, kwargs_source_sigma, kwargs_source_fixed, kwargs_lower_source,
                          kwargs_upper_source]
+        if self._shapelets_order is not None:
+            source_model_list, source_params = \
+                self._add_source_shapelets(self._shapelets_order, source_model_list, source_params)
         return source_model_list, source_params
 
     def setup_lens_model(self, kwargs_lens_macro_init=None, macromodel_samples_fixed=None,

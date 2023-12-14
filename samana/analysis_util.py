@@ -3,8 +3,12 @@ from copy import deepcopy
 from lenstronomy.Workflow.fitting_sequence import FittingSequence
 from samana.image_magnification_util import perturbed_fluxes_from_fluxes, perturbed_flux_ratios_from_flux_ratios
 from samana.output_storage import Output
+import matplotlib.pyplot as plt
+from lenstronomy.Plots.model_plot import ModelPlot
+from lenstronomy.Plots import chain_plot
 
-def nmax_bic_minimize(data, model_class, fitting_kwargs_list, n_max_list, verbose=True):
+
+def nmax_bic_minimize(data, model_class, fitting_kwargs_list, n_max_list, verbose=True, make_plots=False):
     """
 
     :param data:
@@ -18,7 +22,7 @@ def nmax_bic_minimize(data, model_class, fitting_kwargs_list, n_max_list, verbos
     chain_list_list = []
     for n_max in n_max_list:
         if n_max == 0:
-            model = model_class(data)
+            model = model_class(data, shapelets_order=None)
         else:
             model = model_class(data, shapelets_order=n_max)
         kwargs_params = model.kwargs_params()
@@ -35,6 +39,48 @@ def nmax_bic_minimize(data, model_class, fitting_kwargs_list, n_max_list, verbos
         bic = fitting_sequence.bic
         bic_list.append(bic)
         chain_list_list.append(chain_list)
+        if make_plots:
+            kwargs_result = fitting_sequence.best_fit()
+
+            multi_band_list = data.kwargs_data_joint['multi_band_list']
+            modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02,
+                                  cmap_string="gist_heat",
+                                  fast_caustic=True)
+            for i in range(len(chain_list)):
+                chain_plot.plot_chain_list(chain_list, i)
+            f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
+            modelPlot.data_plot(ax=axes[0, 0])
+            modelPlot.model_plot(ax=axes[0, 1])
+            modelPlot.normalized_residual_plot(ax=axes[0, 2], v_min=-6, v_max=6)
+            modelPlot.source_plot(ax=axes[1, 0], deltaPix_source=0.01, numPix=100)
+            modelPlot.convergence_plot(ax=axes[1, 1], v_max=1)
+            modelPlot.magnification_plot(ax=axes[1, 2])
+            f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
+            modelPlot.decomposition_plot(ax=axes[0, 0], text='Lens light', lens_light_add=True, unconvolved=True)
+            modelPlot.decomposition_plot(ax=axes[1, 0], text='Lens light convolved', lens_light_add=True)
+            modelPlot.decomposition_plot(ax=axes[0, 1], text='Source light', source_add=True, unconvolved=True)
+            modelPlot.decomposition_plot(ax=axes[1, 1], text='Source light convolved', source_add=True)
+            modelPlot.decomposition_plot(ax=axes[0, 2], text='All components', source_add=True, lens_light_add=True,
+                                         unconvolved=True)
+            modelPlot.decomposition_plot(ax=axes[1, 2], text='All components convolved', source_add=True,
+                                         lens_light_add=True, point_source_add=True)
+            f.tight_layout()
+            f.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0., hspace=0.05)
+            plt.show()
+
+            fig = plt.figure()
+            fig.set_size_inches(6, 6)
+            ax = plt.subplot(111)
+            kwargs_plot = {'ax': ax,
+                           'index_macromodel': [0, 1],
+                           'with_critical_curves': True,
+                           'v_min': -0.2, 'v_max': 0.2}
+            modelPlot.substructure_plot(band_index=0, **kwargs_plot)
+            print(kwargs_result)
+            print(kwargs_result['kwargs_lens'])
+            a = input('continue')
+        print('bic: ', bic)
+        print('bic list: ', bic_list)
     return bic_list, chain_list_list
 
 def cut_on_data(output, data,
@@ -145,21 +191,38 @@ def cut_on_data(output, data,
     return out_cut_S, weights_imaging_data * weights_flux_ratios
 
 def simulation_output_to_density(output, data, param_names_plot, kwargs_cut_on_data, kwargs_density,
-                                 param_names_macro_plot=None, n_resample=0):
+                                 param_names_macro_plot=None, n_resample=0, custom_weights=None, apply_cuts=True):
 
-    out, weights = cut_on_data(output, data, **kwargs_cut_on_data)
-    for i in range(0, n_resample):
-        _out, _weights = cut_on_data(output, data, **kwargs_cut_on_data)
-        out = Output.join(out, _out)
-        weights = np.append(weights, _weights)
-
-    samples = out.parameter_array(param_names_plot)
+    if apply_cuts:
+        out, weights = cut_on_data(output, data, **kwargs_cut_on_data)
+        if custom_weights is not None:
+            for single_weights in custom_weights:
+                (param, mean, sigma) = single_weights
+                weights *= np.exp(-0.5 * (out.param_dict[param] - mean) **2 / sigma**2)
+        for i in range(0, n_resample):
+            _out, _weights = cut_on_data(output, data, **kwargs_cut_on_data)
+            out = Output.join(out, _out)
+            if custom_weights is not None:
+                for single_weights in custom_weights:
+                    (param, mean, sigma) = single_weights
+                    _weights *= np.exp(-0.5 * (_out.param_dict[param] - mean) ** 2 / sigma ** 2)
+            weights = np.append(weights, _weights)
+        weights = [weights]
+    else:
+        out = output
+        weights = None
+    samples = None
+    if len(param_names_plot) > 0:
+        samples = out.parameter_array(param_names_plot)
     if param_names_macro_plot is not None:
         samples_macro = out.macromodel_parameter_array(param_names_macro_plot)
-        samples = np.hstack((samples, samples_macro))
+        if samples is None:
+            samples = samples_macro
+        else:
+            samples = np.hstack((samples, samples_macro))
         param_names = param_names_plot + param_names_macro_plot
     else:
         param_names = param_names_plot
     from trikde.pdfs import DensitySamples
-    density = DensitySamples(samples, param_names, [weights], **kwargs_density)
+    density = DensitySamples(samples, param_names, weights, **kwargs_density)
     return density, out, weights
