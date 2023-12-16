@@ -14,7 +14,7 @@ from time import time
 
 def forward_model(output_path, job_index, n_keep, data_class, model, preset_model_name,
                   kwargs_sample_realization, kwargs_sample_source, kwargs_sample_fixed_macromodel,
-                  tolerance, log_mlow_mass_sheets=6.0,
+                  tolerance, log_mlow_mass_sheets=6.0, n_max_shapelets=None,
                   rescale_grid_size=1.0, rescale_grid_resolution=2.0, readout_macromodel_samples=True,
                   verbose=False, random_seed_init=None, readout_steps=2, write_sampling_rate=True,
                   n_pso_particles=10, n_pso_iterations=50, num_threads=1, astrometric_uncertainty=True,
@@ -32,6 +32,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
     :param kwargs_sample_fixed_macromodel:
     :param tolerance:
     :param log_mlow_mass_sheets:
+    :param n_max_shapelets: 
     :param rescale_grid_size:
     :param rescale_grid_resolution:
     :param readout_macromodel_samples:
@@ -120,7 +121,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                                             kwargs_sample_source, kwargs_sample_fixed_macromodel, log_mlow_mass_sheets,
                                             rescale_grid_size, rescale_grid_resolution, image_data_grid_resolution_rescale,
                                             verbose, random_seed, n_pso_particles, n_pso_iterations, num_threads,
-                                            astrometric_uncertainty, resample_kwargs_lens, kde_sampler, test_mode)
+                                            n_max_shapelets, astrometric_uncertainty, resample_kwargs_lens, kde_sampler, test_mode)
         seed_counter += 1
         acceptance_rate_counter += 1
         # Once we have computed a couple realizations, keep a log of the time it takes to run per realization
@@ -241,7 +242,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
 def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_sample_realization,
                             kwargs_sample_source, kwargs_sample_macro_fixed, log_mlow_mass_sheets=6.0, rescale_grid_size=1.0,
                             rescale_grid_resolution=2.0, image_data_grid_resolution_rescale=1.0, verbose=False, seed=None,
-                                   n_pso_particles=10, n_pso_iterations=50, num_threads=1, astrometric_uncertainty=True,
+                                   n_pso_particles=10, n_pso_iterations=50, num_threads=1, n_max_shapelets=None, astrometric_uncertainty=True,
                                    resample_kwargs_lens=False, kde_sampler=None, test_mode=False):
 
     # set the random seed for reproducibility
@@ -250,7 +251,7 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         delta_x_image, delta_y_image = data_class.perturb_image_positions()
     else:
         delta_x_image, delta_y_image = np.zeros(len(data_class.x_image)), np.zeros(len(data_class.y_image))
-    model_class = model(data_class, kde_sampler)
+    model_class = model(data_class, kde_sampler, shapelets_order=n_max_shapelets)
     realization_dict, realization_samples, realization_param_names = sample_prior(kwargs_sample_realization)
     source_dict, source_samples, source_param_names = sample_prior(kwargs_sample_source)
     macromodel_samples_fixed_dict, samples_macromodel_fixed, param_names_macro_fixed = sample_prior(kwargs_sample_macro_fixed)
