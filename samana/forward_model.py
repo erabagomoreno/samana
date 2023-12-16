@@ -32,7 +32,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
     :param kwargs_sample_fixed_macromodel:
     :param tolerance:
     :param log_mlow_mass_sheets:
-    :param n_max_shapelets: 
+    :param n_max_shapelets:
     :param rescale_grid_size:
     :param rescale_grid_resolution:
     :param readout_macromodel_samples:
