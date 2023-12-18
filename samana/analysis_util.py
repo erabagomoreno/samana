@@ -78,7 +78,7 @@ def nmax_bic_minimize(data, model_class, fitting_kwargs_list, n_max_list, verbos
             modelPlot.substructure_plot(band_index=0, **kwargs_plot)
             print(kwargs_result)
             print(kwargs_result['kwargs_lens'])
-            a = input('continue')
+            #a = input('continue')
         print('bic: ', bic)
         print('bic list: ', bic_list)
     return bic_list, chain_list_list
