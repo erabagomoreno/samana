@@ -18,9 +18,9 @@ class Mock13Data(MockBase):
         astrometric_uncertainties = [0.003] * 4
         flux_ratio_uncertainties = None
 
-        self.a3a_true = 0.00330
-        self.a4a_true = -0.005354
-        self.delta_phi_m3_true = 0.290809
+        self.a3a_true = 0.003307
+        self.a4a_true = -0.00535
+        self.delta_phi_m3_true = 0.29080
         self.delta_phi_m4_true = 0.0
         if cosmos_source:
             image_data = cosmos_image_data
