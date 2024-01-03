@@ -311,16 +311,17 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         verbose=verbose,
         macromodel_samples_fixed=macromodel_samples_fixed_dict)
 
+    kwargs_constraints = model_class.kwargs_constraints
+    kwargs_likelihood = model_class.kwargs_likelihood
+    if astrometric_uncertainty:
+        kwargs_constraints['point_source_offset'] = True
+    else:
+        kwargs_constraints['point_source_offset'] = False
+
     if use_imaging_data:
         if verbose:
             print('running fitting sequence...')
             t0 = time()
-        kwargs_constraints = model_class.kwargs_constraints
-        kwargs_likelihood = model_class.kwargs_likelihood
-        if astrometric_uncertainty:
-            kwargs_constraints['point_source_offset'] = True
-        else:
-            kwargs_constraints['point_source_offset'] = False
         fitting_sequence = FittingSequence(data_class.kwargs_data_joint,
                                            kwargs_model,
                                            kwargs_constraints,
@@ -349,8 +350,8 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                                              kwargs_lens_init,
                                              index_lens_split,
                                              param_class,
-                                             particle_swarm=False)
-        kwargs_solution, _ = opt.optimize(None, None, verbose=verbose)
+                                             particle_swarm=True)
+        kwargs_solution, _ = opt.optimize(25, 50, verbose=verbose)
 
     if verbose:
         print('computing image magnifications...')
@@ -441,6 +442,17 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         fitting_sequence = None
 
     if test_mode:
+
+        if use_imaging_data is False:
+            fitting_sequence = FittingSequence(data_class.kwargs_data_joint,
+                                               kwargs_model,
+                                               kwargs_constraints,
+                                               kwargs_likelihood,
+                                               kwargs_params,
+                                               mpi=False, verbose=verbose)
+            kwargs_result = fitting_sequence.best_fit()
+            kwargs_result['kwargs_lens'] = kwargs_solution
+
         from lenstronomy.Plots.model_plot import ModelPlot
         from lenstronomy.Plots import chain_plot
         import matplotlib.pyplot as plt
@@ -457,58 +469,43 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                         xycoords='axes fraction',color='w',fontsize=12)
         plt.show()
 
+        modelPlot = ModelPlot(data_class.kwargs_data_joint['multi_band_list'],
+                              kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",
+                              fast_caustic=True,
+                              image_likelihood_mask_list=[data_class.likelihood_mask_imaging_weights])
         if use_imaging_data:
-            modelPlot = ModelPlot(data_class.kwargs_data_joint['multi_band_list'],
-                                  kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",
-                                  fast_caustic=True,
-                                  image_likelihood_mask_list=[data_class.likelihood_mask_imaging_weights])
             chain_plot.plot_chain_list(chain_list, 0)
-            f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
-            modelPlot.data_plot(ax=axes[0, 0])
-            modelPlot.model_plot(ax=axes[0, 1])
-            modelPlot.normalized_residual_plot(ax=axes[0, 2], v_min=-6, v_max=6)
-            modelPlot.source_plot(ax=axes[1, 0], deltaPix_source=0.01, numPix=100)
-            modelPlot.convergence_plot(ax=axes[1, 1], v_max=1)
-            modelPlot.magnification_plot(ax=axes[1, 2])
+        f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
+        modelPlot.data_plot(ax=axes[0, 0])
+        modelPlot.model_plot(ax=axes[0, 1])
+        modelPlot.normalized_residual_plot(ax=axes[0, 2], v_min=-6, v_max=6)
+        modelPlot.source_plot(ax=axes[1, 0], deltaPix_source=0.01, numPix=100)
+        modelPlot.convergence_plot(ax=axes[1, 1], v_max=1)
+        modelPlot.magnification_plot(ax=axes[1, 2])
 
-            f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
-            modelPlot.decomposition_plot(ax=axes[0, 0], text='Lens light', lens_light_add=True, unconvolved=True)
-            modelPlot.decomposition_plot(ax=axes[1, 0], text='Lens light convolved', lens_light_add=True)
-            modelPlot.decomposition_plot(ax=axes[0, 1], text='Source light', source_add=True, unconvolved=True)
-            modelPlot.decomposition_plot(ax=axes[1, 1], text='Source light convolved', source_add=True)
-            modelPlot.decomposition_plot(ax=axes[0, 2], text='All components', source_add=True, lens_light_add=True,
-                                         unconvolved=True)
-            modelPlot.decomposition_plot(ax=axes[1, 2], text='All components convolved', source_add=True,
-                                         lens_light_add=True, point_source_add=True)
-            f.tight_layout()
-            f.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0., hspace=0.05)
-            plt.show()
-            fig = plt.figure()
-            fig.set_size_inches(6, 6)
-            ax = plt.subplot(111)
-            kwargs_plot = {'ax': ax,
-                           'index_macromodel': list(np.arange(0, len(kwargs_result['kwargs_lens']))),
-                           'with_critical_curves': True,
-                           'v_min': -0.1, 'v_max': 0.1,
-                           'super_sample_factor': 5}
-            modelPlot.substructure_plot(band_index=0, **kwargs_plot)
-            plt.show()
-        else:
-            modelPlot = ModelPlot(data_class.kwargs_data_joint['multi_band_list'],
-                                  kwargs_model, None, arrow_size=0.02, cmap_string="gist_heat",
-                                  fast_caustic=True,
-                                  image_likelihood_mask_list=[data_class.likelihood_mask_imaging_weights])
-            fig = plt.figure()
-            fig.set_size_inches(6, 6)
-            ax = plt.subplot(111)
-            kwargs_plot = {'ax': ax,
-                           'index_macromodel': list(np.arange(0, kwargs_solution)),
-                           'with_critical_curves': True,
-                           'v_min': -0.1, 'v_max': 0.1,
-                           'super_sample_factor': 5}
-            modelPlot.substructure_plot(band_index=0, **kwargs_plot)
-            plt.show()
-        a=input('continue')
+        f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
+        modelPlot.decomposition_plot(ax=axes[0, 0], text='Lens light', lens_light_add=True, unconvolved=True)
+        modelPlot.decomposition_plot(ax=axes[1, 0], text='Lens light convolved', lens_light_add=True)
+        modelPlot.decomposition_plot(ax=axes[0, 1], text='Source light', source_add=True, unconvolved=True)
+        modelPlot.decomposition_plot(ax=axes[1, 1], text='Source light convolved', source_add=True)
+        modelPlot.decomposition_plot(ax=axes[0, 2], text='All components', source_add=True, lens_light_add=True,
+                                     unconvolved=True)
+        modelPlot.decomposition_plot(ax=axes[1, 2], text='All components convolved', source_add=True,
+                                     lens_light_add=True, point_source_add=True)
+        f.tight_layout()
+        f.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0., hspace=0.05)
+        plt.show()
+        fig = plt.figure()
+        fig.set_size_inches(6, 6)
+        ax = plt.subplot(111)
+        kwargs_plot = {'ax': ax,
+                       'index_macromodel': list(np.arange(0, len(kwargs_result['kwargs_lens']))),
+                       'with_critical_curves': True,
+                       'v_min': -0.1, 'v_max': 0.1,
+                       'super_sample_factor': 5}
+        modelPlot.substructure_plot(band_index=0, **kwargs_plot)
+        plt.show()
+        a=input('')
 
     return magnifications, images, realization_samples, source_samples, samples_macromodel, samples_macromodel_fixed, \
            logL_imaging_data, fitting_sequence, \
