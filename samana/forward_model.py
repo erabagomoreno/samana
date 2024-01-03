@@ -5,7 +5,10 @@ from lenstronomy.LensModel.lens_model import LensModel
 from lenstronomy.Util.magnification_finite_util import auto_raytracing_grid_resolution, auto_raytracing_grid_size
 from lenstronomy.Workflow.fitting_sequence import FittingSequence
 from lenstronomy.Util.class_creator import create_im_sim
+from lenstronomy.LensModel.QuadOptimizer.optimizer import Optimizer
 from samana.image_magnification_util import setup_gaussian_source
+from samana.param_managers import auto_param_class
+from copy import deepcopy
 import os
 import subprocess
 import numpy as np
@@ -18,7 +21,8 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                   rescale_grid_size=1.0, rescale_grid_resolution=2.0, readout_macromodel_samples=True,
                   verbose=False, random_seed_init=None, readout_steps=2, write_sampling_rate=True,
                   n_pso_particles=10, n_pso_iterations=50, num_threads=1, astrometric_uncertainty=True,
-                  resample_kwargs_lens=False, kde_sampler=None, image_data_grid_resolution_rescale=1.0, test_mode=False):
+                  resample_kwargs_lens=False, kde_sampler=None, image_data_grid_resolution_rescale=1.0,
+                  use_imaging_data=True, test_mode=False):
     """
 
     :param output_path:
@@ -115,13 +119,16 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
         random_seed = random_seed_init + seed_counter
         if random_seed > 4294967295:
             random_seed = random_seed - 4294967296
+
         magnifications, images, realization_samples, source_samples, macromodel_samples, macromodel_samples_fixed, \
         logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, bic, param_names_realization, param_names_source, param_names_macro, \
         param_names_macro_fixed, _ = forward_model_single_iteration(data_class, model, preset_model_name, kwargs_sample_realization,
                                             kwargs_sample_source, kwargs_sample_fixed_macromodel, log_mlow_mass_sheets,
                                             rescale_grid_size, rescale_grid_resolution, image_data_grid_resolution_rescale,
                                             verbose, random_seed, n_pso_particles, n_pso_iterations, num_threads,
-                                            n_max_shapelets, astrometric_uncertainty, resample_kwargs_lens, kde_sampler, test_mode)
+                                            n_max_shapelets, astrometric_uncertainty, resample_kwargs_lens, kde_sampler,
+                                                                    use_imaging_data, test_mode)
+
         seed_counter += 1
         acceptance_rate_counter += 1
         # Once we have computed a couple realizations, keep a log of the time it takes to run per realization
@@ -243,7 +250,7 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                             kwargs_sample_source, kwargs_sample_macro_fixed, log_mlow_mass_sheets=6.0, rescale_grid_size=1.0,
                             rescale_grid_resolution=2.0, image_data_grid_resolution_rescale=1.0, verbose=False, seed=None,
                                    n_pso_particles=10, n_pso_iterations=50, num_threads=1, n_max_shapelets=None, astrometric_uncertainty=True,
-                                   resample_kwargs_lens=False, kde_sampler=None, test_mode=False):
+                                   resample_kwargs_lens=False, kde_sampler=None, use_imaging_data=True, test_mode=False):
 
     # set the random seed for reproducibility
     np.random.seed(seed)
@@ -284,7 +291,7 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         decoupled_multiplane=False,
         macromodel_samples_fixed=macromodel_samples_fixed_dict)
     kwargs_lens_align = kwargs_params['lens_model'][0]
-    realization, _, _, _, _ = align_realization(realization_init, kwargs_model_align['lens_model_list'],
+    realization, _, _, lens_model_align, _ = align_realization(realization_init, kwargs_model_align['lens_model_list'],
                                     kwargs_model_align['lens_redshift_list'], kwargs_lens_align,
                                     data_class.x_image,
                                     data_class.y_image)
@@ -293,37 +300,61 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
     if verbose:
         print('realization has '+str(len(realization.halos))+' halos')
     grid_resolution_image_data = pixel_size * image_data_grid_resolution_rescale
-    kwargs_model, lens_model_init, kwargs_lens_init, index_lens_split = model_class.setup_kwargs_model(decoupled_multiplane=True,
-                                                                               lens_model_list_halos=lens_model_list_halos,
-                                                                               grid_resolution=grid_resolution_image_data,
-                                                                               redshift_list_halos=list(redshift_list_halos),
-                                                                               kwargs_halos=kwargs_halos,
-                                                                                     verbose=verbose,
-                                                                                macromodel_samples_fixed=macromodel_samples_fixed_dict)
-    if verbose:
-        print('running fitting sequence...')
-        t0 = time()
-    kwargs_constraints = model_class.kwargs_constraints
-    kwargs_likelihood = model_class.kwargs_likelihood
-    if astrometric_uncertainty:
-        kwargs_constraints['point_source_offset'] = True
+    astropy_cosmo = realization.lens_cosmo.cosmo.astropy
+
+    kwargs_model, lens_model_init, kwargs_lens_init, index_lens_split = model_class.setup_kwargs_model(
+        decoupled_multiplane=True,
+        lens_model_list_halos=lens_model_list_halos,
+        grid_resolution=grid_resolution_image_data,
+        redshift_list_halos=list(redshift_list_halos),
+        kwargs_halos=kwargs_halos,
+        verbose=verbose,
+        macromodel_samples_fixed=macromodel_samples_fixed_dict)
+
+    if use_imaging_data:
+        if verbose:
+            print('running fitting sequence...')
+            t0 = time()
+        kwargs_constraints = model_class.kwargs_constraints
+        kwargs_likelihood = model_class.kwargs_likelihood
+        if astrometric_uncertainty:
+            kwargs_constraints['point_source_offset'] = True
+        else:
+            kwargs_constraints['point_source_offset'] = False
+        fitting_sequence = FittingSequence(data_class.kwargs_data_joint,
+                                           kwargs_model,
+                                           kwargs_constraints,
+                                           kwargs_likelihood,
+                                           kwargs_params,
+                                           mpi=False, verbose=verbose)
+        fitting_kwargs_list = [
+            ['PSO', {'sigma_scale': 1., 'n_particles': n_pso_particles, 'n_iterations': n_pso_iterations,
+                     'threadCount': num_threads}]
+        ]
+        chain_list = fitting_sequence.fit_sequence(fitting_kwargs_list)
+        kwargs_result = fitting_sequence.best_fit()
+        if verbose:
+            print('done in ' + str(time() - t0) + ' seconds')
+            likelihood_module = fitting_sequence.likelihoodModule
+            print(likelihood_module.log_likelihood(kwargs_result, verbose=True))
+        kwargs_solution = kwargs_result['kwargs_lens']
+
     else:
-        kwargs_constraints['point_source_offset'] = False
-    fitting_sequence = FittingSequence(data_class.kwargs_data_joint,
-                                      kwargs_model,
-                                      kwargs_constraints,
-                                      kwargs_likelihood,
-                                      kwargs_params,
-                                      mpi=False, verbose=verbose)
-    fitting_kwargs_list = [
-        ['PSO', {'sigma_scale': 1., 'n_particles': n_pso_particles, 'n_iterations': n_pso_iterations, 'threadCount': num_threads}]
-    ]
-    chain_list = fitting_sequence.fit_sequence(fitting_kwargs_list)
-    kwargs_result = fitting_sequence.best_fit()
+        param_class = auto_param_class(lens_model_init.lens_model_list,
+                                       kwargs_lens_align,
+                                       macromodel_samples_fixed_dict)
+        opt = Optimizer.decoupled_multiplane(data_class.x_image,
+                                             data_class.y_image,
+                                             lens_model_init,
+                                             kwargs_lens_init,
+                                             index_lens_split,
+                                             param_class,
+                                             particle_swarm=False)
+        kwargs_solution, _ = opt.optimize(None, None, verbose=verbose)
+
     if verbose:
-        print('done in '+str(time() - t0)+' seconds')
-        likelihood_module = fitting_sequence.likelihoodModule
-        print(likelihood_module.log_likelihood(kwargs_result, verbose=True))
+        print('computing image magnifications...')
+    t0 = time()
     lens_model = LensModel(lens_model_list=kwargs_model['lens_model_list'],
                            lens_redshift_list=kwargs_model['lens_redshift_list'],
                            multi_plane=kwargs_model['multi_plane'],
@@ -331,21 +362,18 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                            kwargs_multiplane_model=kwargs_model['kwargs_multiplane_model'],
                            z_source=kwargs_model['z_source'])
     source_x, source_y = lens_model.ray_shooting(data_class.x_image, data_class.y_image,
-                                                 kwargs_result['kwargs_lens'])
-    astropy_cosmo = realization.lens_cosmo.cosmo.astropy
+                                                 kwargs_solution)
     source_model_quasar, kwargs_source = setup_gaussian_source(source_dict['source_size_pc'],
                                                                np.mean(source_x), np.mean(source_y),
                                                                astropy_cosmo, data_class.z_source)
-
     grid_size = rescale_grid_size * auto_raytracing_grid_size(source_dict['source_size_pc'])
     grid_resolution = rescale_grid_resolution * auto_raytracing_grid_resolution(source_dict['source_size_pc'])
-    if verbose:
-        print('computing image magnifications...')
-    t0 = time()
-    magnifications, images = model_class.image_magnification_gaussian(source_model_quasar, kwargs_source,
-                                                                lens_model_init, kwargs_lens_init,
-                                                                kwargs_result['kwargs_lens'],
-                                                                grid_size, grid_resolution)
+    magnifications, images = model_class.image_magnification_gaussian(source_model_quasar,
+                                                                      kwargs_source,
+                                                                      lens_model_init,
+                                                                      kwargs_lens_init,
+                                                                      kwargs_solution,
+                                                                      grid_size, grid_resolution)
     tend = time()
     if verbose:
         print('computed magnifications in '+str(np.round(tend - t0, 1))+' seconds')
@@ -353,33 +381,39 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
 
     samples_macromodel = []
     param_names_macro = []
-    for lm in kwargs_result['kwargs_lens']:
+    for lm in kwargs_solution:
         for key in lm.keys():
             samples_macromodel.append(lm[key])
             param_names_macro.append(key)
     samples_macromodel = np.array(samples_macromodel)
-    image_model = create_im_sim(data_class.kwargs_data_joint['multi_band_list'],
-                                data_class.kwargs_data_joint['multi_band_type'],
-                                kwargs_model,
-                                bands_compute=None,
-                                image_likelihood_mask_list=[data_class.likelihood_mask_imaging_weights],
-                                band_index=0,
-                                kwargs_pixelbased=None,
-                                linear_solver=True)
-    logL_imaging_data = image_model.likelihood_data_given_model(kwargs_result['kwargs_lens'],
-            kwargs_result['kwargs_source'],
-            kwargs_result['kwargs_lens_light'],
-            kwargs_result['kwargs_ps'],
-            kwargs_extinction=kwargs_result['kwargs_extinction'],
-            kwargs_special=kwargs_result['kwargs_special'],
-            source_marg=False,
-            linear_prior=None,
-            check_positive_flux=False)[0]
 
-    if verbose:
-        logL_imaging_data_no_custom_mask = fitting_sequence.likelihoodModule.image_likelihood.logL(**kwargs_result)[0]
-        print('imaging data likelihood (without custom mask): ', logL_imaging_data_no_custom_mask)
-        print('imaging data likelihood (without custom mask): ', logL_imaging_data)
+    if use_imaging_data:
+        bic = fitting_sequence.bic
+        image_model = create_im_sim(data_class.kwargs_data_joint['multi_band_list'],
+                                    data_class.kwargs_data_joint['multi_band_type'],
+                                    kwargs_model,
+                                    bands_compute=None,
+                                    image_likelihood_mask_list=[data_class.likelihood_mask_imaging_weights],
+                                    band_index=0,
+                                    kwargs_pixelbased=None,
+                                    linear_solver=True)
+        logL_imaging_data = image_model.likelihood_data_given_model(kwargs_result['kwargs_lens'],
+                kwargs_result['kwargs_source'],
+                kwargs_result['kwargs_lens_light'],
+                kwargs_result['kwargs_ps'],
+                kwargs_extinction=kwargs_result['kwargs_extinction'],
+                kwargs_special=kwargs_result['kwargs_special'],
+                source_marg=False,
+                linear_prior=None,
+                check_positive_flux=False)[0]
+        if verbose:
+            logL_imaging_data_no_custom_mask = fitting_sequence.likelihoodModule.image_likelihood.logL(**kwargs_result)[
+                0]
+            print('imaging data likelihood (without custom mask): ', logL_imaging_data_no_custom_mask)
+            print('imaging data likelihood (without custom mask): ', logL_imaging_data)
+    else:
+        bic = -1000
+        logL_imaging_data = -1000
 
     stat, flux_ratios, flux_ratios_data = flux_ratio_summary_statistic(data_class.magnifications,
                                                                        magnifications,
@@ -391,18 +425,20 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                                                          data_class.flux_uncertainty, data_class.uncertainty_in_fluxes,
                                                          data_class.keep_flux_ratio_index)
 
-    bic = fitting_sequence.bic
-
     if verbose:
         print('flux ratios data: ', flux_ratios_data)
         print('flux ratios model: ', flux_ratios)
         print('statistic: ', stat)
         print('flux_ratio_likelihood_weight', flux_ratio_likelihood_weight)
-        print('BIC: ', bic)
-
-    kwargs_model_plot = {'multi_band_list': data_class.kwargs_data_joint['multi_band_list'],
+        if use_imaging_data:
+            print('BIC: ', bic)
+    if use_imaging_data:
+        kwargs_model_plot = {'multi_band_list': data_class.kwargs_data_joint['multi_band_list'],
                          'kwargs_model': kwargs_model,
                          'kwargs_params': kwargs_result}
+    else:
+        kwargs_model_plot = {}
+        fitting_sequence = None
 
     if test_mode:
         from lenstronomy.Plots.model_plot import ModelPlot
@@ -420,42 +456,62 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
             ax.annotate('magnification: '+str(np.round(mag,1)), xy=(0.3,0.9),
                         xycoords='axes fraction',color='w',fontsize=12)
         plt.show()
-        modelPlot = ModelPlot(data_class.kwargs_data_joint['multi_band_list'],
-                              kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",
-                              fast_caustic=True, image_likelihood_mask_list=[data_class.likelihood_mask_imaging_weights])
-        chain_plot.plot_chain_list(chain_list, 0)
-        f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
-        modelPlot.data_plot(ax=axes[0, 0])
-        modelPlot.model_plot(ax=axes[0, 1])
-        modelPlot.normalized_residual_plot(ax=axes[0, 2], v_min=-6, v_max=6)
-        modelPlot.source_plot(ax=axes[1, 0], deltaPix_source=0.01, numPix=100)
-        modelPlot.convergence_plot(ax=axes[1, 1], v_max=1)
-        modelPlot.magnification_plot(ax=axes[1, 2])
 
-        f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
-        modelPlot.decomposition_plot(ax=axes[0, 0], text='Lens light', lens_light_add=True, unconvolved=True)
-        modelPlot.decomposition_plot(ax=axes[1, 0], text='Lens light convolved', lens_light_add=True)
-        modelPlot.decomposition_plot(ax=axes[0, 1], text='Source light', source_add=True, unconvolved=True)
-        modelPlot.decomposition_plot(ax=axes[1, 1], text='Source light convolved', source_add=True)
-        modelPlot.decomposition_plot(ax=axes[0, 2], text='All components', source_add=True, lens_light_add=True,
-                                     unconvolved=True)
-        modelPlot.decomposition_plot(ax=axes[1, 2], text='All components convolved', source_add=True,
-                                     lens_light_add=True, point_source_add=True)
-        f.tight_layout()
-        f.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0., hspace=0.05)
-        plt.show()
-        fig = plt.figure()
-        fig.set_size_inches(6, 6)
-        ax = plt.subplot(111)
-        kwargs_plot = {'ax': ax,
-                       'index_macromodel': list(np.arange(0, len(kwargs_result['kwargs_lens']))),
-                       'with_critical_curves': True,
-                       'v_min': -0.1, 'v_max': 0.1,
-                       'super_sample_factor': 5}
-        modelPlot.substructure_plot(band_index=0, **kwargs_plot)
-        plt.show()
+        if use_imaging_data:
+            modelPlot = ModelPlot(data_class.kwargs_data_joint['multi_band_list'],
+                                  kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",
+                                  fast_caustic=True,
+                                  image_likelihood_mask_list=[data_class.likelihood_mask_imaging_weights])
+            chain_plot.plot_chain_list(chain_list, 0)
+            f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
+            modelPlot.data_plot(ax=axes[0, 0])
+            modelPlot.model_plot(ax=axes[0, 1])
+            modelPlot.normalized_residual_plot(ax=axes[0, 2], v_min=-6, v_max=6)
+            modelPlot.source_plot(ax=axes[1, 0], deltaPix_source=0.01, numPix=100)
+            modelPlot.convergence_plot(ax=axes[1, 1], v_max=1)
+            modelPlot.magnification_plot(ax=axes[1, 2])
+
+            f, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=False, sharey=False)
+            modelPlot.decomposition_plot(ax=axes[0, 0], text='Lens light', lens_light_add=True, unconvolved=True)
+            modelPlot.decomposition_plot(ax=axes[1, 0], text='Lens light convolved', lens_light_add=True)
+            modelPlot.decomposition_plot(ax=axes[0, 1], text='Source light', source_add=True, unconvolved=True)
+            modelPlot.decomposition_plot(ax=axes[1, 1], text='Source light convolved', source_add=True)
+            modelPlot.decomposition_plot(ax=axes[0, 2], text='All components', source_add=True, lens_light_add=True,
+                                         unconvolved=True)
+            modelPlot.decomposition_plot(ax=axes[1, 2], text='All components convolved', source_add=True,
+                                         lens_light_add=True, point_source_add=True)
+            f.tight_layout()
+            f.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0., hspace=0.05)
+            plt.show()
+            fig = plt.figure()
+            fig.set_size_inches(6, 6)
+            ax = plt.subplot(111)
+            kwargs_plot = {'ax': ax,
+                           'index_macromodel': list(np.arange(0, len(kwargs_result['kwargs_lens']))),
+                           'with_critical_curves': True,
+                           'v_min': -0.1, 'v_max': 0.1,
+                           'super_sample_factor': 5}
+            modelPlot.substructure_plot(band_index=0, **kwargs_plot)
+            plt.show()
+        else:
+            modelPlot = ModelPlot(data_class.kwargs_data_joint['multi_band_list'],
+                                  kwargs_model, None, arrow_size=0.02, cmap_string="gist_heat",
+                                  fast_caustic=True,
+                                  image_likelihood_mask_list=[data_class.likelihood_mask_imaging_weights])
+            fig = plt.figure()
+            fig.set_size_inches(6, 6)
+            ax = plt.subplot(111)
+            kwargs_plot = {'ax': ax,
+                           'index_macromodel': list(np.arange(0, kwargs_solution)),
+                           'with_critical_curves': True,
+                           'v_min': -0.1, 'v_max': 0.1,
+                           'super_sample_factor': 5}
+            modelPlot.substructure_plot(band_index=0, **kwargs_plot)
+            plt.show()
         a=input('continue')
 
     return magnifications, images, realization_samples, source_samples, samples_macromodel, samples_macromodel_fixed, \
-           logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, bic, realization_param_names, source_param_names, param_names_macro, \
+           logL_imaging_data, fitting_sequence, \
+           stat, flux_ratio_likelihood_weight, bic, realization_param_names, \
+           source_param_names, param_names_macro, \
            param_names_macro_fixed, kwargs_model_plot

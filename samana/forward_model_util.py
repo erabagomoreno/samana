@@ -3,7 +3,12 @@ from scipy.stats.kde import gaussian_kde
 from scipy.interpolate import interp1d
 from lenstronomy.LensModel.lens_model import LensModel
 from lenstronomy.LensModel.Solver.solver4point import Solver4Point
+from lenstronomy.LensModel.QuadOptimizer.optimizer import Optimizer
 from copy import deepcopy
+from pyHalo.preset_models import preset_model_from_name
+from lenstronomy.Util.magnification_finite_util import auto_raytracing_grid_resolution, auto_raytracing_grid_size
+from samana.image_magnification_util import setup_gaussian_source
+from time import time
 # from lenstronomy.LensModel.QuadOptimizer.optimizer import Optimizer
 # from lenstronomy.LensModel.QuadOptimizer.param_manager import PowerLawParamManager
 
