@@ -462,19 +462,16 @@ class EPLMultipole34FixedShear(PowerLawFixedShear):
 
         (thetaE, center_x, center_y, e1, e2, g1, g2) = args
         gamma = self.kwargs_lens[0]['gamma']
-        # handle the EPL profile
         kwargs_epl = {'theta_E': thetaE, 'center_x': center_x, 'center_y': center_y,
                       'e1': e1, 'e2': e2, 'gamma': gamma}
         self.kwargs_lens[0] = kwargs_epl
-        phi, q = ellipticity2phi_q(e1, e2)
-        self.kwargs_lens[0]['a4_a'] = self.am_measured_to_physical(self._a4a_init, thetaE, q)
-        self.kwargs_lens[0]['a3_a'] = self.am_measured_to_physical(self._a3a_init, thetaE, q)
-        self.kwargs_lens[0]['delta_phi_m3'] = phi + self._delta_phi_m3
+        self.kwargs_lens[0]['a4_a'] = self._a4a_init
+        self.kwargs_lens[0]['a3_a'] = self._a3a_init
+        self.kwargs_lens[0]['delta_phi_m3'] = self._delta_phi_m3
         self.kwargs_lens[0]['delta_phi_m4'] = self._delta_phi_m4
         kwargs_shear = {'gamma1': g1, 'gamma2': g2}
         self.kwargs_lens[1] = kwargs_shear
         return self.kwargs_lens
-
 
 class EPLMultipole34FreeShear(PowerLawParamManager):
 
@@ -497,14 +494,12 @@ class EPLMultipole34FreeShear(PowerLawParamManager):
     def args_to_kwargs(self, args):
         (thetaE, center_x, center_y, e1, e2, g1, g2) = args
         gamma = self.kwargs_lens[0]['gamma']
-        # handle the EPL profile
         kwargs_epl = {'theta_E': thetaE, 'center_x': center_x, 'center_y': center_y,
                       'e1': e1, 'e2': e2, 'gamma': gamma}
         self.kwargs_lens[0] = kwargs_epl
-        phi, q = ellipticity2phi_q(e1, e2)
-        self.kwargs_lens[0]['a4_a'] = self.am_measured_to_physical(self._a4a_init, thetaE, q)
-        self.kwargs_lens[0]['a3_a'] = self.am_measured_to_physical(self._a3a_init, thetaE, q)
-        self.kwargs_lens[0]['delta_phi_m3'] = phi + self._delta_phi_m3
+        self.kwargs_lens[0]['a4_a'] = self._a4a_init
+        self.kwargs_lens[0]['a3_a'] = self._a3a_init
+        self.kwargs_lens[0]['delta_phi_m3'] = self._delta_phi_m3
         self.kwargs_lens[0]['delta_phi_m4'] = self._delta_phi_m4
         kwargs_shear = {'gamma1': g1, 'gamma2': g2}
         self.kwargs_lens[1] = kwargs_shear

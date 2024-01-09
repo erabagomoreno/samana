@@ -344,15 +344,16 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         param_class = auto_param_class(lens_model_init.lens_model_list,
                                        kwargs_lens_align,
                                        macromodel_samples_fixed_dict)
+        n_macro_models = len(kwargs_lens_align)
+        kwargs_lens = kwargs_lens_align + kwargs_lens_init[n_macro_models:]
         opt = Optimizer.decoupled_multiplane(data_class.x_image,
                                              data_class.y_image,
                                              lens_model_init,
-                                             kwargs_lens_init,
+                                             kwargs_lens,
                                              index_lens_split,
                                              param_class,
                                              particle_swarm=True)
         kwargs_solution, _ = opt.optimize(25, 50, verbose=verbose)
-
     if verbose:
         print('computing image magnifications...')
     t0 = time()
