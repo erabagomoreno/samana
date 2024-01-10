@@ -339,32 +339,43 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
             likelihood_module = fitting_sequence.likelihoodModule
             print(likelihood_module.log_likelihood(kwargs_result, verbose=True))
         kwargs_solution = kwargs_result['kwargs_lens']
+        lens_model = LensModel(lens_model_list=kwargs_model['lens_model_list'],
+                               lens_redshift_list=kwargs_model['lens_redshift_list'],
+                               multi_plane=kwargs_model['multi_plane'],
+                               decouple_multi_plane=kwargs_model['decouple_multi_plane'],
+                               kwargs_multiplane_model=kwargs_model['kwargs_multiplane_model'],
+                               z_source=kwargs_model['z_source'])
 
     else:
         param_class = auto_param_class(lens_model_init.lens_model_list,
                                        kwargs_lens_align,
                                        macromodel_samples_fixed_dict)
-        n_macro_models = len(kwargs_lens_align)
-        kwargs_lens = kwargs_lens_align + kwargs_lens_init[n_macro_models:]
+        kwargs_lens_init = kwargs_lens_align + kwargs_lens_init[len(kwargs_lens_align):]
         opt = Optimizer.decoupled_multiplane(data_class.x_image,
                                              data_class.y_image,
                                              lens_model_init,
-                                             kwargs_lens,
+                                             kwargs_lens_init,
                                              index_lens_split,
-                                             param_class,
-                                             particle_swarm=True)
+                                             param_class
+                                             )
         kwargs_solution, _ = opt.optimize(25, 50, verbose=verbose)
+        lens_model = LensModel(lens_model_list=kwargs_model['lens_model_list'],
+                               lens_redshift_list=kwargs_model['lens_redshift_list'],
+                               multi_plane=kwargs_model['multi_plane'],
+                               decouple_multi_plane=kwargs_model['decouple_multi_plane'],
+                               kwargs_multiplane_model=opt.kwargs_multiplane_model,
+                               z_source=kwargs_model['z_source'])
+
     if verbose:
+        print('\n')
+        print('kwargs solution: ', kwargs_solution)
+        print('\n')
         print('computing image magnifications...')
     t0 = time()
-    lens_model = LensModel(lens_model_list=kwargs_model['lens_model_list'],
-                           lens_redshift_list=kwargs_model['lens_redshift_list'],
-                           multi_plane=kwargs_model['multi_plane'],
-                           decouple_multi_plane=kwargs_model['decouple_multi_plane'],
-                           kwargs_multiplane_model=kwargs_model['kwargs_multiplane_model'],
-                           z_source=kwargs_model['z_source'])
+
     source_x, source_y = lens_model.ray_shooting(data_class.x_image, data_class.y_image,
                                                  kwargs_solution)
+
     source_model_quasar, kwargs_source = setup_gaussian_source(source_dict['source_size_pc'],
                                                                np.mean(source_x), np.mean(source_y),
                                                                astropy_cosmo, data_class.z_source)
@@ -466,7 +477,7 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         axes_list = [ax1, ax2, ax3, ax4]
         for mag, ax, image in zip(magnifications, axes_list, images):
             ax.imshow(image, origin='lower')
-            ax.annotate('magnification: '+str(np.round(mag,1)), xy=(0.3,0.9),
+            ax.annotate('magnification: '+str(np.round(mag,2)), xy=(0.3,0.9),
                         xycoords='axes fraction',color='w',fontsize=12)
         plt.show()
 
