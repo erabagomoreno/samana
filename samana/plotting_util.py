@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 from copy import deepcopy
 import numpy as np
 from lenstronomy.LensModel.lens_model_extensions import LensModelExtensions
+from samana.analysis_util import simulation_output_to_density
+from trikde.pdfs import IndepdendentLikelihoods
 
 plt.rcParams['axes.linewidth'] = 2.5
 plt.rcParams['xtick.major.width'] = 3.5
@@ -12,6 +14,52 @@ plt.rcParams['ytick.major.width'] = 3.5
 plt.rcParams['ytick.major.size'] = 10
 plt.rcParams['ytick.labelsize'] = 20
 plt.rcParams['xtick.labelsize'] = 20
+
+def setup_macromodel_inference_plot(output, mock_data_class,
+                                    param_names_plot_macro=None,
+                                    param_names_plot=None,
+                                    flux_ratio_uncertainty=0.001,
+                                    imaging_data_hard_cut=True,
+                                    imaging_data_likelihood=False,
+                                    percentile_cut_image_data=10,
+                                    n_keep=2000,
+                                    s_cut=None,
+                                    imaging_data_likelihood_scale=20,
+                                    nbins=10,
+                                    use_kde=False,
+                                    param_ranges=None,
+                                    n_resample=5):
+
+    if flux_ratio_uncertainty <= 0.001:
+        n_resample = 0
+    if param_names_plot is None:
+        param_names_plot = []
+    if param_names_plot_macro is None:
+        param_names_plot_macro = ['theta_E', 'q', 'gamma_ext', 'gamma', 'a4_a_cos', 'a3_a_cos']
+    kwargs_pdf = {'ABC_flux_ratio_likelihood': True,
+                  'flux_ratio_uncertainty_percentage': [flux_ratio_uncertainty] * 3,
+                  'uncertainty_in_flux_ratios': True,
+                  'imaging_data_likelihood': imaging_data_likelihood,
+                  'imaging_data_hard_cut': imaging_data_hard_cut,
+                  'percentile_cut_image_data': percentile_cut_image_data,
+                  'n_keep_S_statistic': n_keep,
+                  'S_statistic_tolerance': s_cut,
+                  'perturb_measurements': True,
+                  'imaging_data_likelihood_scale': imaging_data_likelihood_scale
+                  }
+    kwargs_density = {'nbins': nbins,
+                      'use_kde': use_kde,
+                      'param_ranges': param_ranges}
+    density, _, _ = simulation_output_to_density(deepcopy(output),
+                                                 deepcopy(mock_data_class),
+                                                 param_names_plot,
+                                                 kwargs_pdf,
+                                                 kwargs_density,
+                                                 param_names_plot_macro,
+                                                 n_resample=n_resample)
+    like = IndepdendentLikelihoods([density])
+    param_ranges_density = density.param_ranges
+    return like, param_ranges_density
 
 def mock_lens_data_plot(image_sim, window_size, vminmax=1.5, cmap='gist_heat', label='', zd='', zs='',
                         save_fig=False, filename=None):

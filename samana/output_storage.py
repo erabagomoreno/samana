@@ -163,9 +163,7 @@ class Output(object):
 
     def macromodel_parameter_array(self, param_names):
 
-        if 'q' in param_names or 'phi_q' in param_names:
-            phi_q, q = ellipticity2phi_q(self.macromodel_samples_dict['e1'],
-                                         self.macromodel_samples_dict['e2'])
+        phi_q, q = ellipticity2phi_q(self.macromodel_samples_dict['e1'], self.macromodel_samples_dict['e2'])
         if 'gamma_ext' in param_names or 'phi_gamma' in param_names:
             phi_gamma, gamma_ext = shear_cartesian2polar(self.macromodel_samples_dict['gamma1'],
                                                          self.macromodel_samples_dict['gamma2'])
@@ -179,6 +177,12 @@ class Output(object):
                 samples[:, i] = gamma_ext
             elif param_name == 'phi_gamma':
                 samples[:, i] = phi_gamma
+            elif param_name == 'a3_a_cos':
+                samples[:, i] = self.macromodel_samples_dict['a3_a'] * \
+                                np.cos(3 * (phi_q + self.macromodel_samples_dict['delta_phi_m3']))
+            elif param_name == 'a4_a_cos':
+                samples[:, i] = self.macromodel_samples_dict['a4_a'] * \
+                                np.cos(4 * (phi_q + self.macromodel_samples_dict['delta_phi_m4']))
             elif param_name == 'f2/f1':
                 samples[:, i] = self.flux_ratios[:, 0]
             elif param_name == 'f3/f1':
@@ -187,6 +191,7 @@ class Output(object):
                 samples[:, i] = self.flux_ratios[:, 2]
             else:
                 samples[:, i] = self.macromodel_samples_dict[param_name]
+
         return samples
 
     @classmethod

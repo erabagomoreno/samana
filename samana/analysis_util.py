@@ -140,6 +140,7 @@ def cut_on_data(output, data,
                 S_statistic_tolerance=None,
                 perturb_measurements=True,
                 perturb_model=True,
+                imaging_data_likelihood_scale=20,
                 verbose=False):
     """
 
@@ -160,6 +161,8 @@ def cut_on_data(output, data,
     __out = deepcopy(output)
     if imaging_data_hard_cut is False:
         percentile_cut_image_data = 100.0 # keep everything
+    else:
+        assert percentile_cut_image_data is not None
 
     if uncertainty_in_flux_ratios:
         mags_measured = data_class.magnifications
@@ -229,7 +232,16 @@ def cut_on_data(output, data,
 
     if imaging_data_likelihood:
         assert imaging_data_hard_cut is False
-        weights_imaging_data = np.exp(out_cut_S.image_data_logL - np.max(out_cut_S.image_data_logL))
+        relative_log_likelihoods = out_cut_S.image_data_logL - np.max(out_cut_S.image_data_logL)
+        rescale_log_like = 1.0
+        weights_imaging_data = np.exp(relative_log_likelihoods / rescale_log_like)
+        effective_sample_size = np.sum(weights_imaging_data)
+        target_sample_size = len(weights_imaging_data) / imaging_data_likelihood_scale
+        while effective_sample_size < target_sample_size:
+            rescale_log_like += 1
+            weights_imaging_data = np.exp(relative_log_likelihoods / rescale_log_like)
+            effective_sample_size = np.sum(weights_imaging_data)
+            target_sample_size = len(weights_imaging_data) / imaging_data_likelihood_scale
     else:
         weights_imaging_data = np.ones(out_cut_S.parameters.shape[0])
 
