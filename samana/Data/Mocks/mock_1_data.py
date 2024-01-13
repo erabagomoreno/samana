@@ -28,3 +28,4 @@ class Mock1Data(MockBase):
         super(Mock1Data, self).__init__(z_lens, z_source, x_image, y_image,
                                     magnifications, astrometric_uncertainties, flux_ratio_uncertainties,
                                         image_data, super_sample_factor)
+
