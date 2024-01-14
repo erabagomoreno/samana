@@ -7,11 +7,11 @@ class Mock23Data(MockBase):
 
     def __init__(self, super_sample_factor=1.0, cosmos_source=False):
 
-        z_lens = 0.7
-        z_source = 2.5
-        x_image = [-1.03403541,  0.80327916, -0.11950895,  0.5349661 ]
-        y_image = [-0.36572184,  0.65674337,  0.99163149, -0.77320926]
-        magnifications_true = [ 7.05251363, 12.51565702,  9.60090307,  6.90652539]
+        z_lens = 0.46
+        z_source = 2.7
+        x_image = [-1.03172646,  0.61729877, -0.34614795,  0.38593992]
+        y_image = [-0.00899676,  0.86855948,  0.94332842, -0.86147284]
+        magnifications_true = [ 9.62093838, 10.53799588, 12.08146717,  6.54396696]
         magnification_measurement_errors = 0.0
         magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
         astrometric_uncertainties = [0.003] * 4
