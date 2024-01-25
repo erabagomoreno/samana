@@ -10,7 +10,8 @@ from trikde.pdfs import IndepdendentLikelihoods
 
 def inference(mock_lens_data_list, param_names_plot, param_names_macro_plot, keep_lens_index, simulation_list, kwargs_density, flux_ratio_measurement_uncertainty,
               n_resample, percentile_cut_image_data, n_keep_S_statistic, ABC_flux_ratio_likelihood=True,
-              S_statistic_tolerance=None):
+              S_statistic_tolerance=None, make_plot=False):
+
     _output_list = []
     pdf_list = []
 
@@ -42,15 +43,15 @@ def inference(mock_lens_data_list, param_names_plot, param_names_macro_plot, kee
         pdf_list.append(_density)
         if S_statistic_tolerance is not None and n_keep_S_statistic is None:
             print('number of samples after cut on S statistic: ', len(_output.flux_ratio_summary_statistic))
-
-    fig = plt.figure()
-    fig.set_size_inches(8, 6)
-    ax = plt.subplot(111)
-    for _out in _output_list:
-        ax.hist(_out.flux_ratio_summary_statistic, label='Lens ' + str(mock_lens_index), bins=20, range=(0.0, 0.15),
-                alpha=0.5)
-    ax.legend(fontsize=14)
-    ax.set_xlim(0.0, 0.15)
+    if make_plot:
+        fig = plt.figure()
+        fig.set_size_inches(8, 6)
+        ax = plt.subplot(111)
+        for _out in _output_list:
+            ax.hist(_out.flux_ratio_summary_statistic, label='Lens ' + str(mock_lens_index), bins=20, range=(0.0, 0.15),
+                    alpha=0.5)
+        ax.legend(fontsize=14)
+        ax.set_xlim(0.0, 0.15)
     return IndepdendentLikelihoods(pdf_list), _output_list
 
 def nmax_bic_minimize(data, model_class, fitting_kwargs_list, n_max_list, verbose=True, make_plots=False):
@@ -141,6 +142,7 @@ def cut_on_data(output, data,
                 perturb_measurements=True,
                 perturb_model=True,
                 imaging_data_likelihood_scale=20,
+                cut_image_data_first=True,
                 verbose=False):
     """
 
@@ -159,6 +161,7 @@ def cut_on_data(output, data,
     """
     data_class = deepcopy(data)
     __out = deepcopy(output)
+
     if imaging_data_hard_cut is False:
         percentile_cut_image_data = 100.0 # keep everything
     else:
@@ -216,34 +219,62 @@ def cut_on_data(output, data,
                                           model_image_magnifications,
                                           flux_ratio_uncertainty_percentage)
 
-    _out = __out.cut_on_image_data(percentile_cut=percentile_cut_image_data)
+    if cut_image_data_first:
+        _out = __out.cut_on_image_data(percentile_cut=percentile_cut_image_data)
+        if ABC_flux_ratio_likelihood:
+            # now cut on flux ratios
+            if S_statistic_tolerance is not None:
+                assert n_keep_S_statistic is None
+                n_keep_S_statistic = np.sum(_out.flux_ratio_summary_statistic < S_statistic_tolerance)
+            weights_flux_ratios = 1.0
+            out_cut_S = _out.cut_on_S_statistic(keep_best_N=n_keep_S_statistic)
+        else:
+            n_keep_S_statistic = -1
+            out_cut_S = _out.cut_on_S_statistic(keep_best_N=n_keep_S_statistic)
+            weights_flux_ratios = out_cut_S.flux_ratio_likelihood
 
-    if ABC_flux_ratio_likelihood:
-        # now cut on flux ratios
-        if S_statistic_tolerance is not None:
-            assert n_keep_S_statistic is None
-            n_keep_S_statistic = np.sum(_out.flux_ratio_summary_statistic < S_statistic_tolerance)
-        weights_flux_ratios = 1.0
-        out_cut_S = _out.cut_on_S_statistic(keep_best_N=n_keep_S_statistic)
-    else:
-        n_keep_S_statistic = -1
-        out_cut_S = _out.cut_on_S_statistic(keep_best_N=n_keep_S_statistic)
-        weights_flux_ratios = out_cut_S.flux_ratio_likelihood
-
-    if imaging_data_likelihood:
-        assert imaging_data_hard_cut is False
-        relative_log_likelihoods = out_cut_S.image_data_logL - np.max(out_cut_S.image_data_logL)
-        rescale_log_like = 1.0
-        weights_imaging_data = np.exp(relative_log_likelihoods / rescale_log_like)
-        effective_sample_size = np.sum(weights_imaging_data)
-        target_sample_size = len(weights_imaging_data) / imaging_data_likelihood_scale
-        while effective_sample_size < target_sample_size:
-            rescale_log_like += 1
+        if imaging_data_likelihood:
+            assert imaging_data_hard_cut is False
+            relative_log_likelihoods = out_cut_S.image_data_logL - np.max(out_cut_S.image_data_logL)
+            rescale_log_like = 1.0
             weights_imaging_data = np.exp(relative_log_likelihoods / rescale_log_like)
             effective_sample_size = np.sum(weights_imaging_data)
             target_sample_size = len(weights_imaging_data) / imaging_data_likelihood_scale
+            while effective_sample_size < target_sample_size:
+                rescale_log_like += 1
+                weights_imaging_data = np.exp(relative_log_likelihoods / rescale_log_like)
+                effective_sample_size = np.sum(weights_imaging_data)
+                target_sample_size = len(weights_imaging_data) / imaging_data_likelihood_scale
+        else:
+            weights_imaging_data = np.ones(out_cut_S.parameters.shape[0])
     else:
-        weights_imaging_data = np.ones(out_cut_S.parameters.shape[0])
+        if ABC_flux_ratio_likelihood:
+            # now cut on flux ratios
+            if S_statistic_tolerance is not None:
+                assert n_keep_S_statistic is None
+                n_keep_S_statistic = np.sum(__out.flux_ratio_summary_statistic < S_statistic_tolerance)
+            weights_flux_ratios = 1.0
+            _out = __out.cut_on_S_statistic(keep_best_N=n_keep_S_statistic)
+        else:
+            n_keep_S_statistic = -1
+            _out = __out.cut_on_S_statistic(keep_best_N=n_keep_S_statistic)
+            weights_flux_ratios = _out.flux_ratio_likelihood
+
+        if imaging_data_likelihood:
+            assert imaging_data_hard_cut is False
+            relative_log_likelihoods = _out.image_data_logL - np.max(_out.image_data_logL)
+            rescale_log_like = 1.0
+            weights_imaging_data = np.exp(relative_log_likelihoods / rescale_log_like)
+            effective_sample_size = np.sum(weights_imaging_data)
+            target_sample_size = len(weights_imaging_data) / imaging_data_likelihood_scale
+            while effective_sample_size < target_sample_size:
+                rescale_log_like += 1
+                weights_imaging_data = np.exp(relative_log_likelihoods / rescale_log_like)
+                effective_sample_size = np.sum(weights_imaging_data)
+                target_sample_size = len(weights_imaging_data) / imaging_data_likelihood_scale
+        else:
+            weights_imaging_data = np.ones(_out.parameters.shape[0])
+        out_cut_S = _out.cut_on_image_data(percentile_cut=percentile_cut_image_data)
 
     return out_cut_S, weights_imaging_data * weights_flux_ratios
 
@@ -283,3 +314,8 @@ def simulation_output_to_density(output, data, param_names_plot, kwargs_cut_on_d
     from trikde.pdfs import DensitySamples
     density = DensitySamples(samples, param_names, weights, **kwargs_density)
     return density, out, weights
+
+# def likelihood_function_change(pdf1, pdf2):
+#
+#     from trikde.
+

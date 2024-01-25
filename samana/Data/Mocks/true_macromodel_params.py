@@ -14,15 +14,23 @@ def get_true_params(lens_index, macromodel_samples_list):
           'gamma': 1.892554448155309, 'a4_a': -0.004348301531541436, 'a3_a': 0.00022775720058585444,
           'delta_phi_m3': -0.06702598174099228, 'delta_phi_m4': 0.0}, {'gamma1': -0.06, 'gamma2': 0.03}]
     elif lens_index == 3:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.09805538702908832, 'e2': 0.002701904179452389, 'gamma': 1.9539957879337315, 'a4_a': 0.010248068016826362, 'a3_a': -0.005147357370025712, 'delta_phi_m3': 0.053195439182018855, 'delta_phi_m4': 0.0}, {'gamma1': -0.01, 'gamma2': 0.09}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.09805538702908832, 'e2': 0.002701904179452389,
+                        'gamma': 1.9539957879337315, 'a4_a': 0.010248068016826362,
+                        'a3_a': -0.005147357370025712, 'delta_phi_m3': 0.053195439182018855, 'delta_phi_m4': 0.0}, {'gamma1': -0.01, 'gamma2': 0.09}]
     elif lens_index == 4:
         true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.14902045524131477, 'e2': 0.16189838398964046,
           'gamma': 2.145162560647839, 'a4_a': 0.0004500167278941548, 'a3_a': 0.002251807533098353,
           'delta_phi_m3': 0.48907250375086353, 'delta_phi_m4': 0.0}, {'gamma1': -0.01, 'gamma2': 0.09}]
     elif lens_index == 5:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.0034955619674783118, 'e2': 0.12626665005177207, 'gamma': 2.1367585524167274, 'a4_a': 0.003715905688783965, 'a3_a': -0.0014697990179525606, 'delta_phi_m3': -0.2911280704507563, 'delta_phi_m4': 0.0}, {'gamma1': 0.1, 'gamma2': -0.05}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.0034955619674783118,
+                        'e2': 0.12626665005177207, 'gamma': 2.1367585524167274,
+                        'a4_a': 0.003715905688783965, 'a3_a': -0.0014697990179525606,
+                        'delta_phi_m3': -0.2911280704507563, 'delta_phi_m4': 0.0}, {'gamma1': 0.1, 'gamma2': -0.05}]
     elif lens_index == 6:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.07603400411704919, 'e2': 0.24238190469213294, 'gamma': 2.0, 'a4_a': -0.005256260448144398, 'a3_a': 0.005024586292580997, 'delta_phi_m3': 0.41140218854650545, 'delta_phi_m4': 0.0}, {'gamma1': -0.04, 'gamma2': 0.04}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.07603400411704919,
+                        'e2': 0.24238190469213294, 'gamma': 2.0, 'a4_a': -0.005256260448144398,
+                        'a3_a': 0.005024586292580997, 'delta_phi_m3': 0.41140218854650545,
+                        'delta_phi_m4': 0.0}, {'gamma1': -0.04, 'gamma2': 0.04}]
     elif lens_index == 7:
         true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.009316606097975175, 'e2': 0.32009147091177126,
           'gamma': 2.0, 'a4_a': 0.014570832287334776, 'a3_a': -0.0016030162747218797,
@@ -32,13 +40,23 @@ def get_true_params(lens_index, macromodel_samples_list):
           'gamma': 2.0573463026292904, 'a4_a': 0.0018056599088162486, 'a3_a': -0.00782030346109874,
           'delta_phi_m3': 0.3910543561483979, 'delta_phi_m4': 0.0}, {'gamma1': -0.0, 'gamma2': 0.065}]
     elif lens_index == 9:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.1754778225671725, 'e2': -0.040664784446933055, 'gamma': 1.8595595133129548, 'a4_a': -0.03956558326293978, 'a3_a': 0.005, 'delta_phi_m3': -0.5127349870534571, 'delta_phi_m4': 0.0}, {'gamma1': -0.03, 'gamma2': 0.065}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.1754778225671725,
+                        'e2': -0.040664784446933055, 'gamma': 1.8595595133129548,
+                        'a4_a': -0.03956558326293978, 'a3_a': 0.005,
+                        'delta_phi_m3': -0.5127349870534571, 'delta_phi_m4': 0.0}, {'gamma1': -0.03, 'gamma2': 0.065}]
     elif lens_index == 10:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.0010025953139360796, 'e2': 0.16708081865317795, 'gamma': 1.933562029172763, 'a4_a': -0.001354484915560101, 'a3_a': 0.00018886307201135396, 'delta_phi_m3': 0.28412631321802206, 'delta_phi_m4': 0.0}, {'gamma1': 0.01, 'gamma2': -0.025}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.0010025953139360796,
+                        'e2': 0.16708081865317795, 'gamma': 1.933562029172763, 'a4_a': -0.001354484915560101,
+                        'a3_a': 0.00018886307201135396, 'delta_phi_m3': 0.28412631321802206, 'delta_phi_m4': 0.0},
+                       {'gamma1': 0.01, 'gamma2': -0.025}]
     elif lens_index == 11:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.05750376366439197, 'e2': 0.16209438330567794, 'gamma': 1.9681100995264538, 'a4_a': -0.0038259098896556345, 'a3_a': -0.00014642596529442495, 'delta_phi_m3': -0.33482079885157356, 'delta_phi_m4': 0.0}, {'gamma1': -0.05, 'gamma2': -0.05}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.05750376366439197,
+                        'e2': 0.16209438330567794, 'gamma': 1.9681100995264538,
+                        'a4_a': -0.0038259098896556345, 'a3_a': -0.00014642596529442495, 'delta_phi_m3': -0.33482079885157356, 'delta_phi_m4': 0.0}, {'gamma1': -0.05, 'gamma2': -0.05}]
     elif lens_index == 12:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.03288947350554445, 'e2': 0.0022859778522262854, 'gamma': 1.95793079624987, 'a4_a': 0.008941596482682836, 'a3_a': -0.004408132271037109, 'delta_phi_m3': -0.3621598245727988, 'delta_phi_m4': 0.0}, {'gamma1': 0.09, 'gamma2': -0.02}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.03288947350554445,
+                        'e2': 0.0022859778522262854, 'gamma': 1.95793079624987, 'a4_a': 0.008941596482682836,
+                        'a3_a': -0.004408132271037109, 'delta_phi_m3': -0.3621598245727988, 'delta_phi_m4': 0.0}, {'gamma1': 0.09, 'gamma2': -0.02}]
     elif lens_index == 13:
         true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.22066354572659455, 'e2': -0.09420233055103952, 'gamma': 2.063256852303305, 'a4_a': -0.0053543373280677264, 'a3_a': 0.003307751130197963, 'delta_phi_m3': 0.29080928431429665, 'delta_phi_m4': 0.0}, {'gamma1': 0.01, 'gamma2': -0.02}]
     elif lens_index == 14:
@@ -64,11 +82,14 @@ def get_true_params(lens_index, macromodel_samples_list):
     elif lens_index == 22:
         true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.021940008018599265, 'e2': 0.02396452122386181, 'gamma': 1.8755185370033827, 'a4_a': -0.006050312054248666, 'a3_a': -0.013122203824845042, 'delta_phi_m3': -0.30529941135499195, 'delta_phi_m4': 0.0}, {'gamma1': -0.05, 'gamma2': -0.07}]
     elif lens_index == 23:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.19081663833534684, 'e2': 0.05080821749684399, 'gamma': 2.1579395230681304, 'a4_a': -0.007234861724844146, 'a3_a': -0.004637315438040289, 'delta_phi_m3': 0.01811430160503147, 'delta_phi_m4': 0.0}, {'gamma1': -0.065, 'gamma2': 0.07}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.2, 'e2': 0.05080821749684399, 'gamma': 2.1579395230681304, 'a4_a': -0.007234861724844146, 'a3_a': -0.004637315438040289, 'delta_phi_m3': 0.01811430160503147, 'delta_phi_m4': 0.0}, {'gamma1': -0.04, 'gamma2': 0.05}]
     elif lens_index == 24:
         true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.08087191916720839, 'e2': -0.04086435788939368, 'gamma': 1.84514891037334, 'a4_a': -0.01228094773535638, 'a3_a': -0.0030478033716739954, 'delta_phi_m3': 0.4817289935614363, 'delta_phi_m4': 0.0}, {'gamma1': 0.015, 'gamma2': 0.05}]
     elif lens_index == 25:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.03556747044943813, 'e2': -0.12566208151258698, 'gamma': 2.035094644416148, 'a4_a': 0.006042882987330165, 'a3_a': -0.008121659523875422, 'delta_phi_m3': 0.3875930895147712, 'delta_phi_m4': 0.0}, {'gamma1': 0.045, 'gamma2': 0.05}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.03556747044943813,
+                        'e2': -0.12566208151258698, 'gamma': 2.035094644416148, 'a4_a': 0.006042882987330165,
+                        'a3_a': -0.008121659523875422, 'delta_phi_m3': 0.3875930895147712,
+                        'delta_phi_m4': 0.0}, {'gamma1': 0.045, 'gamma2': 0.05}]
 
     phiq, q = ellipticity2phi_q(true_params[0]['e1'], true_params[0]['e2'])
     phi_gamma_ext, gamma_ext = shear_cartesian2polar(true_params[1]['gamma1'], true_params[1]['gamma2'])
@@ -83,6 +104,10 @@ def get_true_params(lens_index, macromodel_samples_list):
             true_params_out[param] = true_params['a3_a'] * np.cos(3 * (phiq + true_params['delta_phi_m3']))
         elif param == 'a4_a_cos':
             true_params_out[param] = true_params['a4_a'] * np.cos(4 * (phiq + true_params['delta_phi_m4']))
+        elif param == 'gamma_cos_phi_gamma':
+            true_params_out[param] = gamma_ext * np.cos(2 * phi_gamma_ext)
+        elif param == 'q_cos_phi':
+            true_params_out[param] = q * np.cos(phiq)
         else:
             true_params_out[param] = true_params[param]
     return true_params_out

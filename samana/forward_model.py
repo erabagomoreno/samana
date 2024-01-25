@@ -423,7 +423,7 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
             logL_imaging_data_no_custom_mask = fitting_sequence.likelihoodModule.image_likelihood.logL(**kwargs_result)[
                 0]
             print('imaging data likelihood (without custom mask): ', logL_imaging_data_no_custom_mask)
-            print('imaging data likelihood (without custom mask): ', logL_imaging_data)
+            print('imaging data likelihood (with custom mask): ', logL_imaging_data)
     else:
         bic = -1000
         logL_imaging_data = -1000

@@ -164,8 +164,7 @@ class Output(object):
     def macromodel_parameter_array(self, param_names):
 
         phi_q, q = ellipticity2phi_q(self.macromodel_samples_dict['e1'], self.macromodel_samples_dict['e2'])
-        if 'gamma_ext' in param_names or 'phi_gamma' in param_names:
-            phi_gamma, gamma_ext = shear_cartesian2polar(self.macromodel_samples_dict['gamma1'],
+        phi_gamma, gamma_ext = shear_cartesian2polar(self.macromodel_samples_dict['gamma1'],
                                                          self.macromodel_samples_dict['gamma2'])
         samples = np.empty((self.macromodel_samples.shape[0], len(param_names)))
         for i, param_name in enumerate(param_names):
@@ -177,6 +176,10 @@ class Output(object):
                 samples[:, i] = gamma_ext
             elif param_name == 'phi_gamma':
                 samples[:, i] = phi_gamma
+            elif param_name == 'gamma_cos_phi_gamma':
+                samples[:, i] = gamma_ext * np.cos(2*phi_gamma)
+            elif param_name == 'q_cos_phi':
+                samples[:, i] = q * np.cos(phi_q)
             elif param_name == 'a3_a_cos':
                 samples[:, i] = self.macromodel_samples_dict['a3_a'] * \
                                 np.cos(3 * (phi_q + self.macromodel_samples_dict['delta_phi_m3']))
@@ -296,34 +299,49 @@ class Output(object):
                       flux_ratio_summary_statistic=flux_ratio_summary_statistic,
                       flux_ratio_likelihood=flux_ratio_likelihood)
 
-    def cut_on_image_data(self, percentile_cut):
+    def cut_on_image_data(self, percentile_cut, logL_threshold=None, select_worst=False):
         """
 
         :param percentile_cut:
         :return:
         """
-        inds_sorted = np.argsort(self.image_data_logL)
-        idx_cut = int((100 - percentile_cut) / 100 * len(self.image_data_logL))
-        logL_cut = self.image_data_logL[inds_sorted[idx_cut]]
-        inds_keep = np.where(self.image_data_logL >= logL_cut)[0]
+        if logL_threshold is None:
+            inds_sorted = np.argsort(self.image_data_logL)
+            if select_worst:
+                idx_cut = int(percentile_cut / 100 * len(self.image_data_logL))
+                logL_cut = self.image_data_logL[inds_sorted[idx_cut]]
+                inds_keep = np.where(self.image_data_logL <= logL_cut)[0]
+            else:
+                idx_cut = int((100 - percentile_cut) / 100 * len(self.image_data_logL))
+                logL_cut = self.image_data_logL[inds_sorted[idx_cut]]
+                inds_keep = np.where(self.image_data_logL >= logL_cut)[0]
+        else:
+            if select_worst:
+                inds_keep = np.where(self.image_data_logL <= logL_threshold)[0]
+            else:
+                inds_keep = np.where(self.image_data_logL >= logL_threshold)[0]
         return self._subsample(inds_keep)
 
-    def cut_on_S_statistic(self, keep_best_N=None, percentile_cut=None, S_statistic_cut=None):
+    def cut_on_S_statistic(self, keep_best_N=None, S_statistic_cut=None, select_worst=False):
         """
 
         :param percentile_cut:
         :return:
         """
         sorted_inds = np.argsort(self.flux_ratio_summary_statistic)
+        L = len(sorted_inds)
         if keep_best_N is not None:
-            assert percentile_cut is None and S_statistic_cut is None
-            inds_keep = sorted_inds[0:keep_best_N]
-        elif percentile_cut is not None:
             assert S_statistic_cut is None
-            idxcut = int(self.parameters.shape[0] * percentile_cut/100)
-            inds_keep = sorted_inds[0:idxcut]
+            if select_worst:
+                idx = L - keep_best_N
+                inds_keep = sorted_inds[idx:]
+            else:
+                inds_keep = sorted_inds[0:keep_best_N]
         elif S_statistic_cut is not None:
-            inds_keep = np.where(self.flux_ratio_summary_statistic <= S_statistic_cut)[0]
+            if select_worst:
+                inds_keep = np.where(self.flux_ratio_summary_statistic <= S_statistic_cut)[0]
+            else:
+                inds_keep = np.where(self.flux_ratio_summary_statistic >= S_statistic_cut)[0]
         else:
             raise Exception('must specify keep_best_N, percentile_cut, or S_statistic_cut')
         return self._subsample(inds_keep)
@@ -347,3 +365,21 @@ class Output(object):
         else:
             raise Exception('must specify keep_best_N, percentile_cut, or likelihood_cut')
         return self._subsample(inds_keep)
+
+    def plot_joint_statistics(self, ax=None, s_max=0.1, logLlower=None, **kwargs_plot):
+
+        import matplotlib.pyplot as plt
+        if ax is None:
+            fig = plt.figure(1)
+            fig.set_size_inches(6, 6)
+            ax = plt.subplot(111)
+        s_stat = self.flux_ratio_summary_statistic
+        image_data_logL = self.image_data_logL
+        ax.scatter(s_stat, image_data_logL, **kwargs_plot)
+        smin, smax = np.min(s_stat), s_max
+        logLupper = np.max(image_data_logL)+10
+        if logLlower is None:
+            logLlower = logLupper - 2000
+        ax.set_xlim(smin, smax)
+        ax.set_ylim(logLupper, logLlower)
+        return ax

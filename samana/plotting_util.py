@@ -23,12 +23,12 @@ def setup_macromodel_inference_plot(output, mock_data_class,
                                     imaging_data_likelihood=False,
                                     percentile_cut_image_data=10,
                                     n_keep=2000,
-                                    s_cut=None,
+                                    S_statistic_tolerance=None,
                                     imaging_data_likelihood_scale=20,
                                     nbins=10,
                                     use_kde=False,
                                     param_ranges=None,
-                                    n_resample=5):
+                                    n_resample=0):
 
     if flux_ratio_uncertainty <= 0.001:
         n_resample = 0
@@ -43,7 +43,7 @@ def setup_macromodel_inference_plot(output, mock_data_class,
                   'imaging_data_hard_cut': imaging_data_hard_cut,
                   'percentile_cut_image_data': percentile_cut_image_data,
                   'n_keep_S_statistic': n_keep,
-                  'S_statistic_tolerance': s_cut,
+                  'S_statistic_tolerance': S_statistic_tolerance,
                   'perturb_measurements': True,
                   'imaging_data_likelihood_scale': imaging_data_likelihood_scale
                   }
@@ -62,7 +62,7 @@ def setup_macromodel_inference_plot(output, mock_data_class,
     return like, param_ranges_density
 
 def mock_lens_data_plot(image_sim, window_size, vminmax=1.5, cmap='gist_heat', label='', zd='', zs='',
-                        save_fig=False, filename=None):
+                        save_fig=False, filename=None, x_image=None, y_image=None):
     fig = plt.figure(1)
     fig.set_size_inches(8, 8)
     ax = plt.subplot(111)
@@ -80,8 +80,12 @@ def mock_lens_data_plot(image_sim, window_size, vminmax=1.5, cmap='gist_heat', l
     ax.annotate('1 arcsec', xy=(xlow + 0.165, y - 0.21), fontsize=18, color='w')
     ax.annotate(label + '\n' + r'$z_{\rm{d}} = $' + str(zd) + '\n' + r'$z_{\rm{s}} = $' + str(zs), xy=(0.035, 0.78),
                 xycoords='axes fraction', fontsize=24, color='w')
-    cbar = plt.colorbar(im, fraction=0.046, pad=0.04)
-    cbar.set_label(r'$\log_{10} \ \rm{intensity \ [counts/pixel]}$', fontsize=25)
+    cbar = plt.colorbar(im, fraction=0.046, pad=0.01)
+    cbar.set_label(r'$\log_{10} \ \rm{flux}$', fontsize=25)
+    image_labels = ['A', 'B', 'C', 'D']
+    if x_image is not None:
+        for i in range(0, 4):
+            ax.annotate(image_labels[i], xy=(x_image[i]+0.08, y_image[i]+0.08), color='w', fontsize=22)
     plt.tight_layout()
     if save_fig:
         plt.savefig(filename)
@@ -123,8 +127,12 @@ def mock_substructure_plot(x_image, y_image, window_size, n_pixels, lens_model, 
     ax.annotate('1 arcsec', xy=(xlow + 0.165, y - 0.21), fontsize=18, color='k')
     ax.annotate(label, xy=(0.035, 0.9),
                 xycoords='axes fraction', fontsize=24, color='k')
-    cbar = plt.colorbar(im, fraction=0.046, pad=0.04, ticks=[-0.1, -0.05, 0.0, 0.05, 0.1])
-    cbar.set_label('DM substructure convergence', fontsize=20)
+    cbar = plt.colorbar(im, fraction=0.046, pad=0.01, ticks=[-0.1, -0.05, 0.0, 0.05, 0.1])
+    cbar.set_label(r'$\kappa_{\rm{DM}}$', fontsize=25, labelpad=-2.5)
+    # image_labels = ['A', 'B', 'C', 'D']
+    # for i in range(0, 4):
+    #     ax.annotate(image_labels[i], xy=(x_image[i]+0.05, y_image[i]+0.05), color='k', fontsize=15)
+
     plt.tight_layout()
     if save_fig:
         plt.savefig(filename)
