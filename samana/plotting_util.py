@@ -116,7 +116,7 @@ def mock_substructure_plot(x_image, y_image, window_size, n_pixels, lens_model, 
     ra_crit_list, dec_crit_list, _, _ = ext.critical_curve_caustics(kwargs_lens, compute_window=window_size,
                                                                     grid_scale=0.01)
     for (racrit, deccrit) in zip(ra_crit_list[0:1], dec_crit_list[0:1]):
-        ax.plot(racrit, deccrit, color='k')
+        ax.plot(racrit, deccrit, color='g', linestyle='--', lw=4)
 
     ax.set_xticks([])
     ax.set_yticks([])

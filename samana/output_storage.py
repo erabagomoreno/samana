@@ -299,27 +299,36 @@ class Output(object):
                       flux_ratio_summary_statistic=flux_ratio_summary_statistic,
                       flux_ratio_likelihood=flux_ratio_likelihood)
 
-    def cut_on_image_data(self, percentile_cut, logL_threshold=None, select_worst=False):
+    def cut_on_image_data(self, percentile_cut, logL_threshold=None, select_worst=False, undo_prior=True):
         """
 
         :param percentile_cut:
         :return:
         """
+        if undo_prior:
+            a3 = self._macromodel_samples_dict['a3_a']
+            a4 = self._macromodel_samples_dict['a4_a']
+            w = np.exp(-0.5 * a3 ** 2 / 0.005 ** 2) * np.exp(-0.5 * a4 ** 2 / 0.01 ** 2)
+            logL_a3a4 = np.log(w)
+            image_data_logL = self.image_data_logL - logL_a3a4
+        else:
+            image_data_logL = self.image_data_logL
+
         if logL_threshold is None:
-            inds_sorted = np.argsort(self.image_data_logL)
+            inds_sorted = np.argsort(image_data_logL)
             if select_worst:
-                idx_cut = int(percentile_cut / 100 * len(self.image_data_logL))
-                logL_cut = self.image_data_logL[inds_sorted[idx_cut]]
-                inds_keep = np.where(self.image_data_logL <= logL_cut)[0]
+                idx_cut = int(percentile_cut / 100 * len(image_data_logL))
+                logL_cut = image_data_logL[inds_sorted[idx_cut]]
+                inds_keep = np.where(image_data_logL <= logL_cut)[0]
             else:
-                idx_cut = int((100 - percentile_cut) / 100 * len(self.image_data_logL))
-                logL_cut = self.image_data_logL[inds_sorted[idx_cut]]
-                inds_keep = np.where(self.image_data_logL >= logL_cut)[0]
+                idx_cut = int((100 - percentile_cut) / 100 * len(image_data_logL))
+                logL_cut = image_data_logL[inds_sorted[idx_cut]]
+                inds_keep = np.where(image_data_logL >= logL_cut)[0]
         else:
             if select_worst:
-                inds_keep = np.where(self.image_data_logL <= logL_threshold)[0]
+                inds_keep = np.where(image_data_logL <= logL_threshold)[0]
             else:
-                inds_keep = np.where(self.image_data_logL >= logL_threshold)[0]
+                inds_keep = np.where(image_data_logL >= logL_threshold)[0]
         return self._subsample(inds_keep)
 
     def cut_on_S_statistic(self, keep_best_N=None, S_statistic_cut=None, select_worst=False):
