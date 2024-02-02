@@ -245,6 +245,7 @@ def cut_on_data(output, data,
                 weights_imaging_data = np.exp(relative_log_likelihoods / rescale_log_like)
                 effective_sample_size = np.sum(weights_imaging_data)
                 target_sample_size = len(weights_imaging_data) / imaging_data_likelihood_scale
+            print('rescaled relative log-likelihoods by '+str(rescale_log_like))
         else:
             weights_imaging_data = np.ones(out_cut_S.parameters.shape[0])
     else:
