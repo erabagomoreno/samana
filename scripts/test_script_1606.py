@@ -1,16 +1,16 @@
 from samana.forward_model import forward_model
-from samana.Data.Mocks.mock_1_data import Mock1Data
-from samana.Model.Mocks.mock_1_model import Mock1Model
+from samana.Data.j1606_jwst_data import J1606Data
+from samana.Model.j1606_model import J1606Model
 import os
 import numpy as np
 import sys
 
 # set the job index for the run
 job_index = int(sys.argv[1])
-data_class = Mock1Data(cosmos_source=True)
-model = Mock1Model
+data_class = J1606Data() #this looks like a function since the class has an __init__
+model = J1606Model #this doesnt look like a function since the class does not have an __init__
 
-job_name = '1606'
+job_name = 'test_1606'
 preset_model_name = 'WDM' # uses preset models in pyHalo
 
 # Priors on dark matter parameters

@@ -14,7 +14,7 @@ from samana.Data.ImageData.no_imaging_data import image_data as no_imaging_data
 
 
 
-class _J1606(MockBase):#Replace this with ImagingDataBase eventually?
+class J1606Data(MockBase):#Replace this with ImagingDataBase eventually?
     
     def __init__(self, image_position_uncertainties, flux_uncertainties, magnifications,
                  uncertainty_in_fluxes, supersample_factor):
@@ -35,7 +35,7 @@ class _J1606(MockBase):#Replace this with ImagingDataBase eventually?
         astrometric_uncertainties = [0.005] * 4
         keep_flux_ratio_index = [0, 1, 2]# this line is hard coded in the MockBase class
         image_data = no_imaging_data
-        super(_J1606, self).__init__(z_lens, z_source, x_image, y_image,
+        super(J1606, self).__init__(z_lens, z_source, x_image, y_image,
                                     magnifications, astrometric_uncertainties, flux_ratio_uncertainties,
                                         image_data, supersample_factor)
 
