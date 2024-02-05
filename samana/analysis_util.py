@@ -8,8 +8,13 @@ from lenstronomy.Plots.model_plot import ModelPlot
 from lenstronomy.Plots import chain_plot
 from trikde.pdfs import IndepdendentLikelihoods
 
-def inference(mock_lens_data_list, param_names_plot, param_names_macro_plot, keep_lens_index, simulation_list, kwargs_density, flux_ratio_measurement_uncertainty,
-              n_resample, percentile_cut_image_data, n_keep_S_statistic, ABC_flux_ratio_likelihood=True,
+def inference(mock_lens_data_list, param_names_plot, param_names_macro_plot, keep_lens_index, simulation_list,
+              kwargs_density, flux_ratio_measurement_uncertainty,
+            imaging_data_likelihood=True,
+            imaging_data_hard_cut=False,
+             imaging_data_likelihood_scale=10.0,
+              percentile_cut_image_data=None,
+              n_resample=0, n_keep_S_statistic=None, ABC_flux_ratio_likelihood=True,
               S_statistic_tolerance=None, make_plot=False):
 
     _output_list = []
@@ -23,9 +28,10 @@ def inference(mock_lens_data_list, param_names_plot, param_names_macro_plot, kee
         kwargs_pdf = {'ABC_flux_ratio_likelihood': ABC_flux_ratio_likelihood,
                       'flux_ratio_uncertainty_percentage': [flux_ratio_measurement_uncertainty] * 3,
                       'uncertainty_in_flux_ratios': True,
-                      'imaging_data_likelihood': False,
-                      'imaging_data_hard_cut': True,
+                      'imaging_data_likelihood': imaging_data_likelihood,
+                      'imaging_data_hard_cut': imaging_data_hard_cut,
                       'percentile_cut_image_data': percentile_cut_image_data,
+                      'imaging_data_likelihood_scale': imaging_data_likelihood_scale,
                       'n_keep_S_statistic': n_keep_S_statistic,
                       'S_statistic_tolerance': S_statistic_tolerance,
                       'perturb_measurements': True
@@ -245,7 +251,7 @@ def cut_on_data(output, data,
                 weights_imaging_data = np.exp(relative_log_likelihoods / rescale_log_like)
                 effective_sample_size = np.sum(weights_imaging_data)
                 target_sample_size = len(weights_imaging_data) / imaging_data_likelihood_scale
-            print('rescaled relative log-likelihoods by '+str(rescale_log_like))
+            #print('rescaled relative log-likelihoods by '+str(rescale_log_like))
         else:
             weights_imaging_data = np.ones(out_cut_S.parameters.shape[0])
     else:

@@ -40,10 +40,9 @@ def get_true_params(lens_index, macromodel_samples_list):
           'gamma': 2.0573463026292904, 'a4_a': 0.0018056599088162486, 'a3_a': -0.00782030346109874,
           'delta_phi_m3': 0.3910543561483979, 'delta_phi_m4': 0.0}, {'gamma1': -0.0, 'gamma2': 0.065}]
     elif lens_index == 9:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.1754778225671725,
-                        'e2': -0.040664784446933055, 'gamma': 1.8595595133129548,
-                        'a4_a': -0.03956558326293978, 'a3_a': 0.005,
-                        'delta_phi_m3': -0.5127349870534571, 'delta_phi_m4': 0.0}, {'gamma1': -0.03, 'gamma2': 0.065}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.1978279163146989, 'e2': 0.08773891128358625,
+                        'gamma': 1.959335215553067, 'a4_a': -0.01, 'a3_a': 0.005, 'delta_phi_m3': -0.5127349870534571,
+                        'delta_phi_m4': 0.0}, {'gamma1': -0.03, 'gamma2': 0.045}]
     elif lens_index == 10:
         true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.0010025953139360796,
                         'e2': 0.16708081865317795, 'gamma': 1.933562029172763, 'a4_a': -0.001354484915560101,
@@ -86,10 +85,7 @@ def get_true_params(lens_index, macromodel_samples_list):
     elif lens_index == 24:
         true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.08087191916720839, 'e2': -0.04086435788939368, 'gamma': 1.84514891037334, 'a4_a': -0.01228094773535638, 'a3_a': -0.0030478033716739954, 'delta_phi_m3': 0.4817289935614363, 'delta_phi_m4': 0.0}, {'gamma1': 0.015, 'gamma2': 0.05}]
     elif lens_index == 25:
-        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.03556747044943813,
-                        'e2': -0.12566208151258698, 'gamma': 2.035094644416148, 'a4_a': 0.006042882987330165,
-                        'a3_a': -0.008121659523875422, 'delta_phi_m3': 0.3875930895147712,
-                        'delta_phi_m4': 0.0}, {'gamma1': 0.045, 'gamma2': 0.05}]
+        true_params = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.03556747044943813, 'e2': -0.12566208151258698, 'gamma': 2.035094644416148, 'a4_a': 0.006042882987330165, 'a3_a': -0.008121659523875422, 'delta_phi_m3': 0.3875930895147712, 'delta_phi_m4': 0.0}, {'gamma1': 0.04, 'gamma2': 0.04}]
 
     phiq, q = ellipticity2phi_q(true_params[0]['e1'], true_params[0]['e2'])
     phi_gamma_ext, gamma_ext = shear_cartesian2polar(true_params[1]['gamma1'], true_params[1]['gamma2'])

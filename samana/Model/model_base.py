@@ -24,23 +24,6 @@ class ModelBase(object):
     def update_kwargs_fixed_macro(self, lens_model_list_macro, kwargs_lens_fixed, kwargs_lens_init, macromodel_samples_fixed=None):
 
         if macromodel_samples_fixed is not None:
-            # if 'a4_a' in macromodel_samples_fixed:
-            #     assert lens_model_list_macro[0] in ['EPL_BOXYDISKY', 'EPL_MULTIPOLE_M3M4']
-            #     kwargs_lens_fixed[0]['a4_a'] = macromodel_samples_fixed['a4_a']
-            #     kwargs_lens_init[0]['a4_a'] = macromodel_samples_fixed['a4_a']
-            # if 'a3_a' in macromodel_samples_fixed:
-            #     assert lens_model_list_macro[0] in ['EPL_BOXYDISKY', 'EPL_MULTIPOLE_M3M4']
-            #     kwargs_lens_fixed[0]['a3_a'] = macromodel_samples_fixed['a3_a']
-            #     kwargs_lens_init[0]['a3_a'] = macromodel_samples_fixed['a3_a']
-            # if 'delta_phi_m3' in macromodel_samples_fixed:
-            #     assert lens_model_list_macro[0] in ['EPL_BOXYDISKY', 'EPL_MULTIPOLE_M3M4']
-            #     kwargs_lens_fixed[0]['delta_phi_m3'] = macromodel_samples_fixed['delta_phi_m3']
-            #     kwargs_lens_init[0]['delta_phi_m3'] = macromodel_samples_fixed['delta_phi_m3']
-            # if 'delta_phi_m4' in macromodel_samples_fixed:
-            #     assert lens_model_list_macro[0] in ['EPL_BOXYDISKY', 'EPL_MULTIPOLE_M3M4']
-            #     kwargs_lens_fixed[0]['delta_phi_m4'] = macromodel_samples_fixed['delta_phi_m4']
-            #     kwargs_lens_init[0]['delta_phi_m4'] = macromodel_samples_fixed['delta_phi_m4']
-            # if 'gamma' in
             for param_fixed in macromodel_samples_fixed:
                 kwargs_lens_fixed[0][param_fixed] = macromodel_samples_fixed[param_fixed]
                 kwargs_lens_init[0][param_fixed] = macromodel_samples_fixed[param_fixed]
