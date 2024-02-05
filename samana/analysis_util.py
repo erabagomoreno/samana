@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from lenstronomy.Plots.model_plot import ModelPlot
 from lenstronomy.Plots import chain_plot
 from trikde.pdfs import IndepdendentLikelihoods
-
+# code for turbocharging paper conducted with commit version dde303b
 def inference(mock_lens_data_list, param_names_plot, param_names_macro_plot, keep_lens_index, simulation_list,
               kwargs_density, flux_ratio_measurement_uncertainty,
             imaging_data_likelihood=True,
