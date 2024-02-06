@@ -2,10 +2,11 @@ import numpy as np
 from samana.Data.Mocks.base import MockBase
 from samana.Data.ImageData.mock_1_simple import image_data as simple_image_data
 from samana.Data.ImageData.mock_1_cosmos import image_data as cosmos_image_data
+from samana.Data.ImageData.mock_1_2038 import image_data as simulated_2038_image_data
 
 class Mock1Data(MockBase):
 
-    def __init__(self, super_sample_factor=1.0, cosmos_source=False):
+    def __init__(self, super_sample_factor=1.0, cosmos_source=False, sim2038_source=False):
 
         z_lens = 0.5
         z_source = 2.2
@@ -23,6 +24,8 @@ class Mock1Data(MockBase):
         self.delta_phi_m4_true = 0.0
         if cosmos_source:
             image_data = cosmos_image_data
+        elif sim2038_source:
+            image_data = simulated_2038_image_data
         else:
             image_data = simple_image_data
         super(Mock1Data, self).__init__(z_lens, z_source, x_image, y_image,

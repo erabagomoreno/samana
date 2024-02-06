@@ -128,7 +128,7 @@ def mock_substructure_plot(x_image, y_image, window_size, n_pixels, lens_model, 
     ax.annotate(label, xy=(0.035, 0.9),
                 xycoords='axes fraction', fontsize=24, color='k')
     cbar = plt.colorbar(im, fraction=0.046, pad=0.01, ticks=[-0.1, -0.05, 0.0, 0.05, 0.1])
-    cbar.set_label(r'$\kappa_{\rm{DM}}$', fontsize=25, labelpad=-2.5)
+    cbar.set_label(r'$\kappa - \kappa_{\rm{macro}}$', fontsize=25, labelpad=-2.5)
     # image_labels = ['A', 'B', 'C', 'D']
     # for i in range(0, 4):
     #     ax.annotate(image_labels[i], xy=(x_image[i]+0.05, y_image[i]+0.05), color='k', fontsize=15)
