@@ -1,16 +1,16 @@
 from samana.forward_model import forward_model
-from samana.Data.wgdj0405_JWST import WGDJ0405JWST
-from samana.Model.wgdj0405_model import WGDJ0405ModelEPLM3M4Shear
+from samana.Data.j1537 import J1537JWST
+from samana.Model.j1537_model import J1537ModelEPLM3M4Shear
 import os
 import numpy as np
 import sys
 
 # set the job index for the run
 job_index = int(sys.argv[1])
-data_class = WGDJ0405JWST()
-model = WGDJ0405ModelEPLM3M4Shear
+data_class = J1537JWST()
+model = J1537ModelEPLM3M4Shear
 preset_model_name = 'WDM'
-kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
+kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.0, 0.0],
                             'log_mc': ['UNIFORM', 4.0, 10.0],
                             'LOS_normalization': ['UNIFORM', 0.8,1.2],
                             'shmf_log_slope': ['GAUSSIAN',-1.9,0.05],
@@ -30,7 +30,7 @@ kwargs_sample_macro_fixed = {
     'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6]
 }
 
-job_name = 'wgdj0405'
+job_name = 'j1537'
 use_imaging_data = False
 output_path = os.getcwd() + '/data/samana_jobs/'+job_name+'/'
 n_keep = 2000
