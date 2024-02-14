@@ -10,7 +10,7 @@ class _J1537(QuadNoImageDataBase):
         z_source = 1.7
         # we use all three flux ratios to constrain the model
         keep_flux_ratio_index = [0, 1, 2]
-        super(_PSJ1606, self).__init__(z_lens, z_source, x_image, y_image, magnifications, image_position_uncertainties,
+        super(_J1537, self).__init__(z_lens, z_source, x_image, y_image, magnifications, image_position_uncertainties,
                                        flux_uncertainties, uncertainty_in_fluxes, keep_flux_ratio_index)
 
 class J1537JWST(_J1537):
@@ -38,7 +38,7 @@ class J1537JWST(_J1537):
         image_position_uncertainties = [0.005] * 4 # 5 arcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)
-        super(PSJ1606JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
+        super(J1537JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=False)
 '''
     def satellite_galaxy(self, sample=True):

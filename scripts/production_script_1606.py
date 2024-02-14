@@ -35,8 +35,8 @@ kwargs_sample_macro_fixed = {
 
 job_name = 'psj1606'
 use_imaging_data = False
-output_path = os.getcwd() + '/'+job_name+'/'
-n_keep = 2000
+output_path = os.getcwd() + '/data/samana_jobs/'+job_name+'/'
+n_keep = 20000
 tolerance = np.inf
 verbose = True
 random_seed_init = None
