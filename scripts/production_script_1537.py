@@ -10,7 +10,7 @@ job_index = int(sys.argv[1])
 data_class = J1537JWST()
 model = J1537ModelEPLM3M4Shear
 preset_model_name = 'WDM'
-kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.0, 0.0],
+kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
                             'log_mc': ['UNIFORM', 4.0, 10.0],
                             'LOS_normalization': ['UNIFORM', 0.8,1.2],
                             'shmf_log_slope': ['GAUSSIAN',-1.9,0.05],
