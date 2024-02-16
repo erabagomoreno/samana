@@ -1,19 +1,19 @@
 from samana.Data.data_base import QuadNoImageDataBase
 import numpy as np
 
-class _J2026(QuadNoImageDataBase):
+class _J0608(QuadNoImageDataBase):
 
     def __init__(self, x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                  uncertainty_in_fluxes):
 
-        z_lens = 0.5 #fiducial
-        z_source = 2.23
+        z_lens = 0.23 
+        z_source = 0.78
         # we use all three flux ratios to constrain the model
         keep_flux_ratio_index = [0, 1, 2]
-        super(_J2026, self).__init__(z_lens, z_source, x_image, y_image, magnifications, image_position_uncertainties,
+        super(_J0608, self).__init__(z_lens, z_source, x_image, y_image, magnifications, image_position_uncertainties,
                                        flux_uncertainties, uncertainty_in_fluxes, keep_flux_ratio_index)
 
-class J2026JWST(_J2026):
+class J0608JWST(_J0608):
 
     def __init__(self):
         """
@@ -26,9 +26,9 @@ class J2026JWST(_J2026):
         :param uncertainty_in_fluxes: bool; the uncertainties quoted are for fluxes or flux ratios
         """
         Acoords = np.array([0, 0])
-        Bcoords = np.array([0.4157, -1.2115])  #
-        Ccoords = np.array([0.164, -1.4308])
-        Dcoords = np.array([-0.5692, -0.3841])
+        Bcoords = np.array([0.1294, -2.0908])  #
+        Ccoords = np.array([-1.3821, -2.0621])
+        Dcoords = np.array([-2.1779, -0.3842])
         x = np.array([Acoords[0], Bcoords[0], Ccoords[0], Dcoords[0]])
         x_image = x - x.mean()
         y = np.array([Acoords[1], Bcoords[1], Ccoords[1], Dcoords[1]])
@@ -36,7 +36,7 @@ class J2026JWST(_J2026):
         image_position_uncertainties = [0.005] * 4 # 5 marcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)
-        super(J2026JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
+        super(J0608JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=False)
 '''
     def satellite_galaxy(self, sample=True):
