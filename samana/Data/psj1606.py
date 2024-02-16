@@ -25,15 +25,17 @@ class PSJ1606JWST(_PSJ1606):
         :param magnifications: image magnifications; can also be a vector of 1s if tolerance is set to infintiy
         :param uncertainty_in_fluxes: bool; the uncertainties quoted are for fluxes or flux ratios
         """
-        Acoords = np.array([0, 0])
-        Ccoords = np.array(
-            [-0.79179357, -0.90458793])  # These names were reordered to be consistent with double dark matter vision
-        Bcoords = np.array([-1.62141215, -0.59165656])
-        Dcoords = np.array([-1.1289198, 0.15184604])
-        x = np.array([Acoords[0], Bcoords[0], Ccoords[0], Dcoords[0]])
-        x_image = x - x.mean()
-        y = np.array([Acoords[1], Bcoords[1], Ccoords[1], Dcoords[1]])
-        y_image = y - y.mean()
+        #Acoords = np.array([0, 0])
+        #Ccoords = np.array(
+        #    [-0.79179357, -0.90458793])  # These names were reordered to be consistent with double dark matter vision
+        #Bcoords = np.array([-1.62141215, -0.59165656])
+        #Dcoords = np.array([-1.1289198, 0.15184604])
+        #x = np.array([Acoords[0], Bcoords[0], Ccoords[0], Dcoords[0]])
+        #x_image = x - x.mean()
+        #y = np.array([Acoords[1], Bcoords[1], Ccoords[1], Dcoords[1]])
+        #y_image = y - y.mean()
+        x_image = np.array([ 0.86042523, -0.76106166, 0.06865239, -0.26849227])
+        y_image = np.array([ 0.35832518, -0.23329177, -0.54623962, 0.51033051])
         image_position_uncertainties = [0.005] * 4 # 5 arcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)

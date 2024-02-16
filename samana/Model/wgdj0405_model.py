@@ -108,9 +108,9 @@ class WGDJ0405ModelEPLM3M4Shear(_WGDJ0405ModelBase):
     def setup_lens_model(self, kwargs_lens_macro_init=None, macromodel_samples_fixed=None):
 
         lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR']
-        kwargs_lens_macro = [{'theta_E': 0.7, 'gamma': 2.05, 'e1': -0.01,
-                              'e2': 0.07, 'center_x': 0.009601035223083986,
-                              'center_y': -0.06606995853487262, 'a3_a': 0.0,
+        kwargs_lens_macro = [{'theta_E': 0.705889, 'gamma': 2.15, 'e1':-0.05246981648674855,
+                              'e2': 0.17190856239844435, 'center_x': 1.881705039515352e-07,
+                              'center_y': 5.200596202172525e-07, 'a3_a': 0.0,
                               'delta_phi_m3': 0.0, 'a4_a': 0.0,
                               'delta_phi_m4': 0.0},
                              {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0.0, 'dec_0': 0.0}]

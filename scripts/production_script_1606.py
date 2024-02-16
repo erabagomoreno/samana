@@ -21,13 +21,13 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM',-2.5,-1.0],
 
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
 kwargs_sample_macro_fixed = {
-    'satellite_1_theta_E': ['GAUSSIAN', 0.2, 0.025],
-    'satellite_1_x': ['GAUSSIAN', -0.25888077, 0.025],
-    'satellite_1_y': ['GAUSSIAN', -1.1975569474999999, 0.025],
+    'satellite_1_theta_E': ['GAUSSIAN', 0.2, 0.05],
+    'satellite_1_x': ['GAUSSIAN', -0.2841, 0.03],
+    'satellite_1_y': ['GAUSSIAN', -1.1753, 0.03],
     # 'a4_a': ['FIXED', data_class.a4a_true],
     # 'a3_a': ['FIXED', data_class.a3a_true],
      #'delta_phi_m3': ['FIXED', data_class.delta_phi_m3_true],
-    'gamma': ['FIXED', 2.0],
+    'gamma': ['FIXED', 1.93],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
     'a3_a': ['GAUSSIAN', 0.0, 0.005],
     'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6]

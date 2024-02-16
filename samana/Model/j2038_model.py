@@ -97,18 +97,24 @@ class J2038ModelEPLM3M4Shear(_J2038ModelBase):
     def setup_lens_model(self, kwargs_lens_macro_init=None, macromodel_samples_fixed=None):
 
         lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR']
-        kwargs_lens_macro = [{'theta_E': 1.3780235432266594,
-                              'gamma': 2.0,
-                              'e1': -0.016594622027332865,
-                              'e2': 0.16171033865384316,
-                              'center_x': 0.1475794143581372,
-                              'center_y': 0.25175537997079345, 'a3_a': 0.0,
+        kwargs_lens_macro = [{'theta_E': 1.3727391766320598, 'gamma': 2.0, 
+                              'e1': -0.032836649223022346, 'e2': 0.12226878340788239, 
+                              'center_x': -5.815142926618169e-15, 'center_y': -1.252478347459837e-14,'a3_a': 0.0,
                               'delta_phi_m3': 0.0, 'a4_a': 0.0,
-                              'delta_phi_m4': 0.0},
-                             {'gamma1': 0.038831457026621344,
-                              'gamma2': -0.02723879062223824,
-                              'ra_0': 0,
-                              'dec_0': 0}]
+                              'delta_phi_m4': 0.0}, 
+                             {'gamma1': 0.02223780213533988, 'gamma2': -0.044782587645082236, 'ra_0': 0, 'dec_0': 0}]
+        #[{'theta_E': 1.3780235432266594,
+        #                      'gamma': 2.0,
+        #                      'e1': -0.016594622027332865,
+        #                      'e2': 0.16171033865384316,
+        #                      'center_x': 0.1475794143581372,
+        #                      'center_y': 0.25175537997079345, 'a3_a': 0.0,
+        #                      'delta_phi_m3': 0.0, 'a4_a': 0.0,
+        #                      'delta_phi_m4': 0.0},
+        #                     {'gamma1': 0.038831457026621344,
+        #                      'gamma2': -0.02723879062223824,
+        #                      'ra_0': 0,
+        #                      'dec_0': 0}]
         #kwargs_lens_macro = [{'theta_E': 0.7, 'gamma': 2.05, 'e1': -0.01,
                              # 'e2': 0.07, 'center_x': 0.009601035223083986,
                              # 'center_y': -0.06606995853487262, 'a3_a': 0.0,

@@ -1,7 +1,7 @@
 from samana.Data.data_base import QuadNoImageDataBase
 import numpy as np
 
-class _J0608(QuadNoImageDataBase):
+class _J2038(QuadNoImageDataBase):
 
     def __init__(self, x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                  uncertainty_in_fluxes):
@@ -10,10 +10,10 @@ class _J0608(QuadNoImageDataBase):
         z_source = 0.78
         # we use all three flux ratios to constrain the model
         keep_flux_ratio_index = [0, 1, 2]
-        super(_J0608, self).__init__(z_lens, z_source, x_image, y_image, magnifications, image_position_uncertainties,
+        super(_J2038, self).__init__(z_lens, z_source, x_image, y_image, magnifications, image_position_uncertainties,
                                        flux_uncertainties, uncertainty_in_fluxes, keep_flux_ratio_index)
 
-class J0608JWST(_J0608):
+class J2038JWST(_J2038):
 
     def __init__(self):
         """
@@ -25,18 +25,12 @@ class J0608JWST(_J0608):
         :param magnifications: image magnifications; can also be a vector of 1s if tolerance is set to infintiy
         :param uncertainty_in_fluxes: bool; the uncertainties quoted are for fluxes or flux ratios
         """
-        Acoords = np.array([0, 0])
-        Bcoords = np.array([0.1294, -2.0908])  #
-        Ccoords = np.array([-1.3821, -2.0621])
-        Dcoords = np.array([-2.1779, -0.3842])
-        x = np.array([Acoords[0], Bcoords[0], Ccoords[0], Dcoords[0]])
-        x_image = x - x.mean()
-        y = np.array([Acoords[1], Bcoords[1], Ccoords[1], Dcoords[1]])
-        y_image = y - y.mean()
+        x_image = np.array([ 0.71909739,  0.84809739, -0.66290261, -1.45890261])
+        y_image = np.array([ 0.88371611, -1.20728389, -1.17828389,  0.49971611])
         image_position_uncertainties = [0.005] * 4 # 5 marcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)
-        super(J0608JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
+        super(J2038JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=False)
 '''
     def satellite_galaxy(self, sample=True):

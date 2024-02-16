@@ -33,6 +33,8 @@ class J0608JWST(_J0608):
         x_image = x - x.mean()
         y = np.array([Acoords[1], Bcoords[1], Ccoords[1], Dcoords[1]])
         y_image = y - y.mean()
+        x_image=  np.array([-0.61861977, -0.00561977,  0.60938023, -0.46261977])
+        y_image=  np.array([-0.01934881,  0.58365119, -0.29234881, -0.41334881])
         image_position_uncertainties = [0.005] * 4 # 5 marcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)

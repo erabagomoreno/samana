@@ -97,18 +97,12 @@ class J2026ModelEPLM3M4Shear(_J2026ModelBase):
     def setup_lens_model(self, kwargs_lens_macro_init=None, macromodel_samples_fixed=None):
 
         lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR']
-        kwargs_lens_macro = [{'theta_E': 0.7084741562249733,
-                              'gamma': 2.0,
-                              'e1': 0.4454798763174089,
-                              'e2': -0.04320070258151579,
-                              'center_x': -0.10399268464002606,
-                              'center_y': 0.023857358813106022,'a3_a': 0.0,
+        kwargs_lens_macro = [{'theta_E': 0.7080359513151707, 'gamma': 2.0, 'e1': 0.44301405649940157, 
+                              'e2': -0.042982860335337526, 'center_x': -7.8816310197601e-08, 
+                              'center_y': -4.050045729301764e-08, 'a3_a': 0.0,
                               'delta_phi_m3': 0.0, 'a4_a': 0.0,
-                              'delta_phi_m4': 0.0},
-                             {'gamma1': 0.038831457026621344,
-                              'gamma2': -0.02723879062223824,
-                              'ra_0': 0,
-                              'dec_0': 0}]
+                              'delta_phi_m4': 0.0}, 
+                              {'gamma1': 0.038831457026621344, 'gamma2': -0.02723879062223824, 'ra_0': 0, 'dec_0': 0}]
         #[{'theta_E': 0.7, 'gamma': 2.05, 'e1': -0.01,
         #                      'e2': 0.07, 'center_x': 0.009601035223083986,
         #                      'center_y': -0.06606995853487262, 'a3_a': 0.0,

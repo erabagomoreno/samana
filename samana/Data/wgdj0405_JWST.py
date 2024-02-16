@@ -19,9 +19,11 @@ class _WGDJ0405(ImagingDataBase):
         # astrometric data
         #x_image = np.array([0.708, -0.358, 0.363, -0.515]) + x_image_offset
         #y_image = np.array([-0.244, -0.567, 0.592, 0.454]) + y_image_offset
-        dx,dy = [-0.36874588, -0.61323798]
-        x_image = np.array([1.065,0,0.721, -0.153 ]) +dx
-        y_image = np.array([0.318, 0,1.152,  1.018]) +dy
+        #dx,dy = [-0.36874588, -0.61323798]
+        #x_image = np.array([1.065,0,0.721, -0.153 ]) +dx
+        #y_image = np.array([0.318, 0,1.152,  1.018]) +dy
+        x_image = np.array( [ 0.69180846, -0.37319154,  0.34780846, -0.53119154])
+        y_image = np.array( [-0.22438233, -0.54938233,  0.61161767,  0.47261767])
         # we use all three flux ratios to constrain the model
         keep_flux_ratio_index = [0, 1, 2]
 
