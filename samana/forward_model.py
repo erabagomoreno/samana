@@ -116,13 +116,14 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
     seed_counter = 0 + n_kept
     while True:
 
+        # the random seed in numpy maxes out at 4294967295
         random_seed = random_seed_init + seed_counter
         if random_seed > 4294967295:
             random_seed = random_seed - 4294967296
 
         magnifications, images, realization_samples, source_samples, macromodel_samples, macromodel_samples_fixed, \
         logL_imaging_data, fitting_sequence, stat, flux_ratio_likelihood_weight, bic, param_names_realization, param_names_source, param_names_macro, \
-        param_names_macro_fixed, _ = forward_model_single_iteration(data_class, model, preset_model_name, kwargs_sample_realization,
+        param_names_macro_fixed, _, _, _ = forward_model_single_iteration(data_class, model, preset_model_name, kwargs_sample_realization,
                                             kwargs_sample_source, kwargs_sample_fixed_macromodel, log_mlow_mass_sheets,
                                             rescale_grid_size, rescale_grid_resolution, image_data_grid_resolution_rescale,
                                             verbose, random_seed, n_pso_particles, n_pso_iterations, num_threads,
@@ -262,8 +263,14 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
     realization_dict, realization_samples, realization_param_names = sample_prior(kwargs_sample_realization)
     source_dict, source_samples, source_param_names = sample_prior(kwargs_sample_source)
     macromodel_samples_fixed_dict, samples_macromodel_fixed, param_names_macro_fixed = sample_prior(kwargs_sample_macro_fixed)
-    present_model_function = preset_model_from_name(preset_model_name)
-    realization_init = present_model_function(data_class.z_lens, data_class.z_source, **realization_dict)
+    if 'SUBSTRUCTURE_REALIZATION' in realization_param_names:
+        if verbose: print('using a user-specified dark matter realization')
+        realization_init = realization_dict['SUBSTRUCTURE_REALIZATION']
+        preset_realization = True
+    else:
+        present_model_function = preset_model_from_name(preset_model_name)
+        realization_init = present_model_function(data_class.z_lens, data_class.z_source, **realization_dict)
+        preset_realization = False
     if verbose:
         print('random seed: ', seed)
         print('SOURCE PARAMETERS: ')
@@ -291,7 +298,10 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         decoupled_multiplane=False,
         macromodel_samples_fixed=macromodel_samples_fixed_dict)
     kwargs_lens_align = kwargs_params['lens_model'][0]
-    realization, _, _, lens_model_align, _ = align_realization(realization_init, kwargs_model_align['lens_model_list'],
+    if preset_realization:
+        realization = realization_init
+    else:
+        realization, _, _, lens_model_align, _ = align_realization(realization_init, kwargs_model_align['lens_model_list'],
                                     kwargs_model_align['lens_redshift_list'], kwargs_lens_align,
                                     data_class.x_image,
                                     data_class.y_image)
@@ -427,6 +437,15 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
     else:
         bic = -1000
         logL_imaging_data = -1000
+        # here we replace the lens model used to solve for the four quasar point sources with a lens model that
+        # is defined across the entrie image plane. This is useful for visualizing the kappa maps, but is not strictly
+        # necessary to run the code.
+        lens_model = LensModel(lens_model_list=kwargs_model['lens_model_list'],
+                               lens_redshift_list=kwargs_model['lens_redshift_list'],
+                               multi_plane=kwargs_model['multi_plane'],
+                               decouple_multi_plane=kwargs_model['decouple_multi_plane'],
+                               kwargs_multiplane_model=kwargs_model['kwargs_multiplane_model'],
+                               z_source=kwargs_model['z_source'])
 
     stat, flux_ratios, flux_ratios_data = flux_ratio_summary_statistic(data_class.magnifications,
                                                                        magnifications,
@@ -523,4 +542,4 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
            logL_imaging_data, fitting_sequence, \
            stat, flux_ratio_likelihood_weight, bic, realization_param_names, \
            source_param_names, param_names_macro, \
-           param_names_macro_fixed, kwargs_model_plot
+           param_names_macro_fixed, kwargs_model_plot, lens_model, kwargs_solution

@@ -3,6 +3,8 @@ from samana.Data.Mocks.base import MockBase
 from samana.Data.ImageData.mock_6_simple import image_data as simple_image_data
 from samana.Data.ImageData.mock_6_cosmos import image_data as cosmos_image_data
 from samana.Data.ImageData.mock_6_2038 import image_data as simulated_2038_image_data
+from samana.Data.ImageData.mock_6_cosmos_wdm import image_data as cosmos_image_data_wdm
+
 
 class Mock6Data(MockBase):
 
@@ -31,3 +33,29 @@ class Mock6Data(MockBase):
         super(Mock6Data, self).__init__(z_lens, z_source, x_image, y_image,
                                     magnifications, astrometric_uncertainties, flux_ratio_uncertainties, image_data,
                                         super_sample_factor)
+
+
+class Mock6DataWDM(MockBase):
+
+    def __init__(self, super_sample_factor=1.0, cosmos_source=True):
+
+        z_lens = 0.55
+        z_source = 2.6
+        x_image = [0.62986, -0.08794, 0.62958, -0.79926]
+        y_image = [-0.93614, 0.97534, 0.72808, -0.19462]
+        magnifications_true = [2.96931, 5.99645, 4.38028, 2.34592]
+        magnification_measurement_errors = 0.0
+        magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
+        astrometric_uncertainties = [0.003] * 4
+        flux_ratio_uncertainties = None
+        self.a3a_true = 0.00502
+        self.a4a_true = -0.005256
+        self.delta_phi_m3_true = 0.411402
+        self.delta_phi_m4_true = 0.0
+        if cosmos_source:
+            image_data = cosmos_image_data_wdm
+        else:
+            raise Exception('only cosmos source implemented for this class')
+        super(Mock6DataWDM, self).__init__(z_lens, z_source, x_image, y_image,
+                                magnifications, astrometric_uncertainties, flux_ratio_uncertainties,
+                                image_data, super_sample_factor)

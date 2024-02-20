@@ -6,7 +6,7 @@ from samana.output_storage import Output
 import matplotlib.pyplot as plt
 from lenstronomy.Plots.model_plot import ModelPlot
 from lenstronomy.Plots import chain_plot
-from trikde.pdfs import IndepdendentLikelihoods
+from trikde.pdfs import IndependentLikelihoods
 # code for turbocharging paper conducted with commit version dde303b
 def inference(mock_lens_data_list, param_names_plot, param_names_macro_plot, keep_lens_index, simulation_list,
               kwargs_density, flux_ratio_measurement_uncertainty,
@@ -321,6 +321,22 @@ def simulation_output_to_density(output, data, param_names_plot, kwargs_cut_on_d
     from trikde.pdfs import DensitySamples
     density = DensitySamples(samples, param_names, weights, **kwargs_density)
     return density, out, weights
+
+def likelihood_function_change(like1, like2, param_ranges, n_draw=50000, nbins=5):
+
+    from trikde.pdfs import InterpolatedLikelihood
+    param_names = ['p1', 'p2']
+    interp1 = InterpolatedLikelihood(like1, param_names, param_ranges)
+    interp2 = InterpolatedLikelihood(like2, param_names, param_ranges)
+    s1 = interp1.sample(n_draw, print_progress=False)
+    s2 = interp2.sample(n_draw, print_progress=False)
+    h1, _, _ = np.histogram2d(s1[:,0], s1[:,1], bins=nbins, range=(param_ranges[0], param_ranges[1]), density=True)
+    h2, _, _ = np.histogram2d(s2[:,0], s2[:,1], bins=nbins, range=(param_ranges[0], param_ranges[1]), density=True)
+    # h1 /= np.max(h1)
+    # h2 /= np.max(h2)
+    delta_h = h2 / h1 - 1
+    total_diff = np.sum(np.absolute(delta_h)) / nbins ** 2
+    return delta_h.T, h1.T, h2.T, total_diff
 
 # def likelihood_function_change(pdf1, pdf2):
 #

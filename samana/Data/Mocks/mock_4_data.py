@@ -3,7 +3,7 @@ from samana.Data.Mocks.base import MockBase
 from samana.Data.ImageData.mock_4_simple import image_data as simple_image_data
 from samana.Data.ImageData.mock_4_cosmos import image_data as cosmos_image_data
 from samana.Data.ImageData.mock_4_2038 import image_data as simulated_2038_image_data
-
+from samana.Data.ImageData.mock_4_cosmos_wdm import image_data as cosmos_image_data_wdm
 
 class Mock4Data(MockBase):
 
@@ -32,3 +32,30 @@ class Mock4Data(MockBase):
         super(Mock4Data, self).__init__(z_lens, z_source, x_image, y_image,
                                     magnifications, astrometric_uncertainties, flux_ratio_uncertainties, image_data,
                                         super_sample_factor)
+
+
+class Mock4DataWDM(MockBase):
+
+    def __init__(self, super_sample_factor=1.0, cosmos_source=True):
+
+        z_lens = 0.5
+        z_source = 1.5
+        x_image = [0.3164, 0.411, 0.98824, -0.88536]
+        y_image = [-0.97356, 0.96816, 0.24091, -0.04522]
+        magnifications_true = [5.42615, 5.24868, 5.74547, 2.67319]
+        magnification_measurement_errors = 0.0
+        magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
+        astrometric_uncertainties = [0.003] * 4
+        flux_ratio_uncertainties = None
+
+        self.a3a_true = 0.00225
+        self.a4a_true = 0.000450
+        self.delta_phi_m3_true = 0.4890
+        self.delta_phi_m4_true = 0.0
+        if cosmos_source:
+            image_data = cosmos_image_data_wdm
+        else:
+            raise Exception('only cosmos source implemented for this class')
+        super(Mock4DataWDM, self).__init__(z_lens, z_source, x_image, y_image,
+                                magnifications, astrometric_uncertainties, flux_ratio_uncertainties,
+                                image_data, super_sample_factor)

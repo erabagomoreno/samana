@@ -4,6 +4,7 @@ from samana.Data.ImageData.mock_3_simple import image_data as simple_image_data
 from samana.Data.ImageData.mock_3_cosmos import image_data as cosmos_image_data
 from samana.Data.ImageData.mock_3_2038 import image_data as simulated_2038_image_data
 from samana.Data.ImageData.mock_3_cosmos_psf3 import image_data as cosmos_image_data_psf3
+from samana.Data.ImageData.mock_3_cosmos_wdm import image_data as cosmos_image_data_wdm
 
 class Mock3Data(MockBase):
 
@@ -50,3 +51,30 @@ class Mock3DataPSF3(Mock3Data):
                       'pixel_size': deltaPix,
                       'truncation': 5}
         return kwargs_psf
+
+
+class Mock3DataWDM(MockBase):
+
+    def __init__(self, super_sample_factor=1.0, cosmos_source=True):
+
+        z_lens = 0.5
+        z_source = 2.5
+        x_image = [0.49581, -0.51783, -0.91788, 0.71571]
+        y_image = [1.06411, -0.90421, 0.11666, -0.53143]
+        magnifications_true = [4.16376, 6.60946, 4.14368, 4.50582]
+        magnification_measurement_errors = 0.0
+        magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
+        astrometric_uncertainties = [0.003] * 4
+        flux_ratio_uncertainties = None
+
+        self.a3a_true = -0.00514
+        self.a4a_true = 0.01024
+        self.delta_phi_m3_true = 0.053195
+        self.delta_phi_m4_true = 0.0
+        if cosmos_source:
+            image_data = cosmos_image_data_wdm
+        else:
+            raise Exception('only cosmos source implemented for this class')
+        super(Mock3DataWDM, self).__init__(z_lens, z_source, x_image, y_image,
+                                magnifications, astrometric_uncertainties, flux_ratio_uncertainties,
+                                image_data, super_sample_factor)
