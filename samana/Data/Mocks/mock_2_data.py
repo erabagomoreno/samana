@@ -55,7 +55,8 @@ class Mock2DataPSF3(Mock2Data):
 class Mock2DataWDM(MockBase):
 
     def __init__(self, super_sample_factor=1.0, cosmos_source=True):
-
+        z_lens = 0.4
+        z_source = 1.7
         x_image = [0.92818, -0.91011, -0.72283, 0.18645]
         y_image = [0.81366, -0.25818, 0.53113, -0.80334]
         magnifications_true = [3.07732, 6.39911, 4.895, 2.36147]
