@@ -90,7 +90,7 @@ def get_true_params(lens_index, macromodel_samples_list):
     phiq, q = ellipticity2phi_q(true_params[0]['e1'], true_params[0]['e2'])
     phi_gamma_ext, gamma_ext = shear_cartesian2polar(true_params[1]['gamma1'], true_params[1]['gamma2'])
     true_params = {**true_params[0], **true_params[1]}
-    true_params['phi_gamma_ext'] = phi_gamma_ext
+    true_params['phi_gamma'] = phi_gamma_ext
     true_params['gamma_ext'] = gamma_ext
     true_params['q'] = q
     true_params['phi_q'] = phiq
