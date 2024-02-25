@@ -2,23 +2,33 @@ from samana.Model.model_base import ModelBase
 import numpy as np
 import pickle
 
-class _WGDJ0405ModelBase(ModelBase):
 
-    # bic weights
-    # no shapelets: 4821
-    # shapelets 1: 4450
-    # shapelets 2: 4373
-    # shapelets 3: 4349
-    # shapelets 4: 4267 (winner)
-    # shapelets 5: 4404
-    # shapelets 6: 4413
+#RK: I updated this to solve the lens equation for the JWST positions in the coordinates I'm using in the Data file
 
-    # bic weights ONLY shapelets
-    # shapelets 4: 4328
+class _J0659ModelBase(ModelBase):
 
     def __init__(self, data_class, kde_sampler, shapelets_order):
         self._shapelets_order = shapelets_order
-        super(_WGDJ0405ModelBase, self).__init__(data_class, kde_sampler)
+        super(_J0659ModelBase, self).__init__(data_class, kde_sampler)
+
+    def update_kwargs_fixed_macro(self, lens_model_list_macro, kwargs_lens_fixed, kwargs_lens_init, macromodel_samples_fixed=None):
+       
+        if macromodel_samples_fixed is not None:
+            for param_fixed in macromodel_samples_fixed:
+                if param_fixed == 'satellite_1_theta_E':
+                    kwargs_lens_fixed[2]['theta_E'] = macromodel_samples_fixed[param_fixed]
+                    kwargs_lens_init[2]['theta_E'] = macromodel_samples_fixed[param_fixed]
+                elif param_fixed == 'satellite_1_x':
+                    kwargs_lens_fixed[2]['center_x'] = macromodel_samples_fixed[param_fixed]
+                    kwargs_lens_init[2]['center_x'] = macromodel_samples_fixed[param_fixed]
+                elif param_fixed == 'satellite_1_y':
+                    kwargs_lens_fixed[2]['center_y'] = macromodel_samples_fixed[param_fixed]
+                    kwargs_lens_init[2]['center_y'] = macromodel_samples_fixed[param_fixed]
+                else:
+                    kwargs_lens_fixed[0][param_fixed] = macromodel_samples_fixed[param_fixed]
+                    kwargs_lens_init[0][param_fixed] = macromodel_samples_fixed[param_fixed]
+        return kwargs_lens_fixed, kwargs_lens_init
+
 
     @property
     def kwargs_constraints(self):
@@ -96,26 +106,55 @@ class _WGDJ0405ModelBase(ModelBase):
                              }
         return kwargs_likelihood
 
-class WGDJ0405ModelEPLM3M4Shear(_WGDJ0405ModelBase):
+class J0659ModelEPLM3M4Shear(_J0659ModelBase):
 
     def __init__(self, data_class, kde_sampler=None, shapelets_order=None):
-        super(WGDJ0405ModelEPLM3M4Shear, self).__init__(data_class, kde_sampler, shapelets_order)
+        super(J0659ModelEPLM3M4Shear, self).__init__(data_class, kde_sampler, shapelets_order)
 
     @property
     def prior_lens(self):
-        return [[0, 'gamma', 2.0, 0.2], [0, 'a4_a', 0.0, 0.01], [0, 'a3_a', 0.0, 0.005]]
+        return [[0, 'gamma', 1.89, 0.2], [0, 'a4_a', 0.0, 0.01], [0, 'a3_a', 0.0, 0.005]]
 
     def setup_lens_model(self, kwargs_lens_macro_init=None, macromodel_samples_fixed=None):
 
-        lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR']
-        kwargs_lens_macro = [{'theta_E': 0.705889, 'gamma': 2.15, 'e1':-0.05246981648674855,
-                              'e2': 0.17190856239844435, 'center_x': 1.881705039515352e-07,
-                              'center_y': 5.200596202172525e-07, 'a3_a': 0.0,
+        lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR', 'SIS']
+        kwargs_lens_macro = [{'theta_E': 2.435980947148659, 'gamma': 1.89, 
+                              'e1': -0.08214414792077979, 'e2': -0.0754564137396995, 
+                              'center_x': 0.0018067467059059987, 'center_y': 0.0001992200379005686,
+                              'a3_a': 0.0,
                               'delta_phi_m3': 0.0, 'a4_a': 0.0,
-                              'delta_phi_m4': 0.0},
-                             {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0.0, 'dec_0': 0.0}]
-        redshift_list_macro = [self._data.z_lens, self._data.z_lens]
-        index_lens_split = [0, 1]
+                              'delta_phi_m4': 0.0}, 
+                              {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0, 'dec_0': 0},
+                              {'theta_E': 0.046, 'center_x':-1.376806746705906, 'center_y':2.4418007799620995}]
+        #[{'theta_E': 0.6946078865697751, 'gamma': 1.89, 
+        #                      'e1': -0.12486233522313107, 'e2': -0.0383171356997024, 
+        #                      'center_x': -5.5523546935129826e-05, 'center_y': 0.00019796001699054337, 'a3_a': 0.0,
+        #                      'delta_phi_m3': 0.0, 'a4_a': 0.0,
+        #                      'delta_phi_m4': 0.0}, 
+        #                     {'gamma1': 0.09754793504464002, 'gamma2': 0.11868522209031938, 'ra_0': 0, 'dec_0': 0},
+        #                     {'theta_E':0.2, 'center_x':-0.2481, 'center_y':-1.1753}]                           
+        #[{'theta_E': 0.6945949744156819,
+        #                      'gamma': 1.93,
+        #                      'e1': -0.12495711394847558,
+        #                      'e2': -0.03829224473702795,
+        #                      'center_x': 0.025119079538381828,
+        #                      'center_y': -0.02228107132160646, 'a3_a': 0.0,
+        #                      'delta_phi_m3': 0.0, 'a4_a': 0.0,
+        #                      'delta_phi_m4': 0.0},
+        #                     {'gamma1': 0.09754793504464002,
+        #                      'gamma2': 0.11868522209031938,
+        #                      'ra_0': 0,
+        #                      'dec_0': 0},
+        #                     {'theta_E': 0.2, 'center_x': -0.2481, 'center_y': -1.1753}]
+        #[{'theta_E': 0.7, 'gamma': 2.05, 'e1': -0.01,
+        #                      'e2': 0.07, 'center_x': 0.009601035223083986,
+        #                      'center_y': -0.06606995853487262, 'a3_a': 0.0,
+        #                      'delta_phi_m3': 0.0, 'a4_a': 0.0,
+        #                      'delta_phi_m4': 0.0},
+        #                     {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0.0, 'dec_0': 0.0},
+        #                     {'theta_E': 0.3, 'center_x': 0.5, 'center_y': 0.5}]
+        redshift_list_macro = [self._data.z_lens, self._data.z_lens, self._data.z_lens]
+        index_lens_split = [0, 1, 2]
         if kwargs_lens_macro_init is not None:
             for i in range(0, len(kwargs_lens_macro_init)):
                 for param_name in kwargs_lens_macro_init[i].keys():
@@ -123,16 +162,18 @@ class WGDJ0405ModelEPLM3M4Shear(_WGDJ0405ModelBase):
         kwargs_lens_init = kwargs_lens_macro
         kwargs_lens_sigma = [{'theta_E': 0.05, 'center_x': 0.1, 'center_y': 0.1, 'e1': 0.2, 'e2': 0.2, 'gamma': 0.1,
                               'a4_a': 0.01, 'a3_a': 0.005, 'delta_phi_m3': np.pi/12, 'delta_phi_m4': np.pi/16},
-                             {'gamma1': 0.05, 'gamma2': 0.05}]
-        kwargs_lens_fixed = [{'delta_phi_m4': 0.0}, {'ra_0': 0.0, 'dec_0': 0.0}]
+                             {'gamma1': 0.05, 'gamma2': 0.05}, {'theta_E': 0.05, 'center_x': 0.05, 'center_y': 0.05}]
+        kwargs_lens_fixed = [{'delta_phi_m4': 0.0}, {'ra_0': 0.0, 'dec_0': 0.0}, {}]
         kwargs_lower_lens = [
             {'theta_E': 0.05, 'center_x': -10.0, 'center_y': -10.0, 'e1': -0.5, 'e2': -0.5, 'gamma': 1.5, 'a4_a': -0.1,
              'a3_a': -0.1, 'delta_phi_m3': -np.pi/6, 'delta_phi_m4': -10.0},
-            {'gamma1': -0.5, 'gamma2': -0.5}]
+            {'gamma1': -0.5, 'gamma2': -0.5},
+            {'theta_E': 0.001, 'center_x': -10, 'center_y': -10}]
         kwargs_upper_lens = [
             {'theta_E': 5.0, 'center_x': 10.0, 'center_y': 10.0, 'e1': 0.5, 'e2': 0.5, 'gamma': 3.5, 'a4_a': 0.1,
              'a3_a': 0.1, 'delta_phi_m3': np.pi/6, 'delta_phi_m4': 10.0},
-            {'gamma1': 0.5, 'gamma2': 0.5}]
+            {'gamma1': 0.5, 'gamma2': 0.5},
+        {'theta_E': 0.5, 'center_x': 10, 'center_y': 10}]
         kwargs_lens_fixed, kwargs_lens_init = self.update_kwargs_fixed_macro(lens_model_list_macro, kwargs_lens_fixed,
                                                                              kwargs_lens_init, macromodel_samples_fixed)
         lens_model_params = [kwargs_lens_init, kwargs_lens_sigma, kwargs_lens_fixed, kwargs_lower_lens,

@@ -1,24 +1,26 @@
 from samana.forward_model import forward_model
-from samana.Data.psj1606 import PSJ1606JWST
-from samana.Model.psj1606_model import PSJ1606ModelEPLM3M4Shear
+from samana.Data.wgdj0405_JWST import WGDJ0405JWST
+from samana.Model.wgdj0405_model import WGDJ0405ModelEPLM3M4Shear
 import os
 import numpy as np
 import sys
 
 # set the job index for the run
 job_index = int(sys.argv[1])
-data_class = PSJ1606JWST()
-model = PSJ1606ModelEPLM3M4Shear
+data_class = WGDJ0405JWST()
+model = WGDJ0405ModelEPLM3M4Shear
 preset_model_name = 'WDM'
-kwargs_sample_realization = {
-    'log10_sigma_sub': ['FIXED',np.log10(0.05)],
-                            'log_mc': ['UNIFORM', 4.0, 4.1]
+kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
+                            'log_mc': ['UNIFORM', 4.0, 10.0],
+                            'LOS_normalization': ['UNIFORM', 0.8,1.2],
+                            'shmf_log_slope': ['GAUSSIAN',-1.9,0.05],
+                            'truncation_model_subhalos': ['FIXED', 'TRUNCATION_GALACTICUS'], # specifies the tidal truncation model
+                            'host_scaling_factor': ['FIXED', 0.88], # formerly k1
+                            'redshift_scaling_factor': ['FIXED', 1.7] # formerly k2
                             }
+
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
 kwargs_sample_macro_fixed = {
-    'satellite_1_theta_E': ['GAUSSIAN', 0.2, 0.025],
-    'satellite_1_x': ['GAUSSIAN', -0.25888077, 0.025],
-    'satellite_1_y': ['GAUSSIAN', -1.1975569474999999, 0.025],
     # 'a4_a': ['FIXED', data_class.a4a_true],
     # 'a3_a': ['FIXED', data_class.a3a_true],
      #'delta_phi_m3': ['FIXED', data_class.delta_phi_m3_true],
@@ -28,10 +30,10 @@ kwargs_sample_macro_fixed = {
     'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6]
 }
 
-job_name = 'psj1606'
+job_name = 'wgdj0405'
 use_imaging_data = False
-output_path = os.getcwd() + '/'+job_name+'/'
-n_keep = 2000
+output_path = os.getcwd() + '/data/samana_jobs/'+job_name+'/'
+n_keep = 10000
 tolerance = np.inf
 verbose = True
 random_seed_init = None

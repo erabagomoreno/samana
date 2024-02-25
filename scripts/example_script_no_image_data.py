@@ -10,7 +10,7 @@ job_index = int(sys.argv[1])
 data_class = Mock1Data(cosmos_source=True)
 model = Mock1Model
 
-job_name = 'mock_1_model'
+job_name = '1606'
 preset_model_name = 'WDM' # uses preset models in pyHalo
 
 # Priors on dark matter parameters
