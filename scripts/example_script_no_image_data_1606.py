@@ -10,21 +10,19 @@ job_index = int(sys.argv[1])
 data_class = PSJ1606JWST()
 model = PSJ1606ModelEPLM3M4Shear
 preset_model_name = 'WDM'
-kwargs_sample_realization = {'log10_sigma_sub': ['FIXED',np.log10(0.05)],
+kwargs_sample_realization = {
+    'log10_sigma_sub': ['FIXED',np.log10(0.05)],
                             'log_mc': ['UNIFORM', 4.0, 4.1]
                             }
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
 kwargs_sample_macro_fixed = {
-    'satellite_1_theta_E': ['GAUSSIAN', 0.2, 0.025],
-    'satellite_1_x': ['GAUSSIAN', 0.5, 0.025],
-    'satellite_1_y': ['GAUSSIAN', 0.75, 0.025],
-    # 'a4_a': ['FIXED', data_class.a4a_true],
-    # 'a3_a': ['FIXED', data_class.a3a_true],
-     #'delta_phi_m3': ['FIXED', data_class.delta_phi_m3_true],
-    'gamma': ['FIXED', 2.0],
-    'a4_a': ['GAUSSIAN', 0.0, 0.01],
-    'a3_a': ['GAUSSIAN', 0.0, 0.005],
-    'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6]
+    'satellite_1_theta_E': ['GAUSSIAN', 0.2, 0.025], # replace with correct theta_E prior
+    'satellite_1_x': ['GAUSSIAN', 0.5, 0.05], # replace with correct position prior
+    'satellite_1_y': ['GAUSSIAN', 0.75, 0.05],# replace with correct position prior
+    'gamma': ['GAUSSIAN', 2.0, 0.1], # logarithmic power-law slope
+    'a4_a': ['GAUSSIAN', 0.0, 0.01], # m4 multi-pole
+    'a3_a': ['GAUSSIAN', 0.0, 0.005], # m3 multi-pole
+    'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6] # m3 orientation
 }
 
 job_name = 'psj1606'
