@@ -126,7 +126,7 @@ class J1042ModelEPLM3M4Shear(_J1042ModelBase):
                              'delta_phi_m4': 0.0},
                             {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0, 'dec_0': 0},
                             {'theta_E':0.09,'center_x':1.655390631244123 ,'center_y':-0.29671644365160643}]
-        redshift_list_macro = [self._data.z_lens, self._data.z_lens]
+        redshift_list_macro = [self._data.z_lens, self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1, 2]
         if kwargs_lens_macro_init is not None:
             for i in range(0, len(kwargs_lens_macro_init)):

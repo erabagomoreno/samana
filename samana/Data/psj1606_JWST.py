@@ -25,8 +25,8 @@ class PSJ1606JWST(_PSJ1606):
         :param magnifications: image magnifications; can also be a vector of 1s if tolerance is set to infintiy
         :param uncertainty_in_fluxes: bool; the uncertainties quoted are for fluxes or flux ratios
         """
-        x_image = np.aarray([ 0.86484416,  0.07307132, -0.75664273, -0.26407334])
-        y_image =  np.array([ 0.36094902, -0.54361578, -0.23066793,  0.51295435])
+        x_image = np.array([ 0.86484416,  0.07307132, -0.75664273, -0.26407334])
+        y_image = np.array([ 0.36094902, -0.54361578, -0.23066793,  0.51295435])
         image_position_uncertainties = [0.005] * 4 # 5 arcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)
