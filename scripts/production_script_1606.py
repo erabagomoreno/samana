@@ -1,6 +1,6 @@
 from samana.forward_model import forward_model
-from samana.Data.psj1606 import PSJ1606JWST
-from samana.Model.psj1606_model import PSJ1606ModelEPLM3M4Shear
+from samana.Data.psj1606_JWST import PSJ1606JWST
+from samana.Model.psj1606_model_JWST import PSJ1606ModelEPLM3M4Shear
 import os
 import numpy as np
 import sys
