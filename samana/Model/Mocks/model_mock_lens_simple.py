@@ -8,6 +8,41 @@ class MockModelBase(ModelBase):
         self._shapelets_order = shapelets_order
         super(MockModelBase, self).__init__(data_class, kde_sampler)
 
+    def _setup_true_source_light_model(self, ra_source, dec_source):
+
+        from paltas.Sources.cosmos import COSMOSCatalog
+        from pyHalo.Cosmology.cosmology import Cosmology
+        from copy import deepcopy
+        import os
+
+        cosmo = Cosmology()
+        colossus_cosmo = cosmo.colossus
+        cosmos_folder = os.getenv('HOME') + '/data/cosmo_catalog/COSMOS_23.5_training_sample/'
+        source_parameters = {'minimum_size_in_pixels': 10.0,
+                             'faintest_apparent_mag': -18,
+                             'max_z': 0.025,
+                             'smoothing_sigma': 0.001,
+                             'cosmos_folder': cosmos_folder,
+                             'random_rotation': 0.0,
+                             'min_flux_radius': 0.0,
+                             'output_ab_zeropoint': 25.95,
+                             'z_source': self._data.z_source,
+                             'center_x': ra_source,
+                             'center_y': dec_source}
+        cosmo = COSMOSCatalog(colossus_cosmo, source_parameters)
+        idx_source = 1
+        source_model_list, kwargs_source_init, zsource_list = cosmo.draw_source(idx_source)
+        kwargs_source_sigma = [{'image': 1.0, 'center_x': 1.0, 'center_y': 1.0, 'phi_G': 1.0, 'scale': 1.0}]
+        kwargs_source_fixed = deepcopy(kwargs_source_init)
+        kwargs_lower_source = [{'image': 1.0, 'center_x': 1.0, 'center_y': 1.0, 'phi_G': 1.0, 'scale': 1.0}]
+        kwargs_upper_source = [{'image': 1.0, 'center_x': 1.0, 'center_y': 1.0, 'phi_G': 1.0, 'scale': 1.0}]
+        source_params = [kwargs_source_init, kwargs_source_sigma, kwargs_source_fixed, kwargs_lower_source,
+                         kwargs_upper_source]
+        if self._shapelets_order is not None:
+            source_model_list, source_params = \
+                self._add_source_shapelets(self._shapelets_order, source_model_list, source_params)
+        return source_model_list, source_params
+
     @staticmethod
     def _add_source_shapelets(n_max, model_list, source_params):
 

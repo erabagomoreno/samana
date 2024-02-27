@@ -86,7 +86,7 @@ class _WGDJ0405(ImagingDataBase):
                       'psf_error_map': self._psf_error_map_init}
         return kwargs_psf
 
-class WGDJ0405NarrowLineFluxes(_WGDJ0405):
+class WGDJ0405_HST(_WGDJ0405):
 
     def __init__(self, supersample_factor=1):
 
@@ -94,10 +94,10 @@ class WGDJ0405NarrowLineFluxes(_WGDJ0405):
         normalized_magnifications = np.array([0.8, 0.52, 1.0, 0.94])
         flux_uncertainties = np.array([0.04, 0.04/0.65, 0.03/1.25, 0.04/1.17])
         uncertainty_in_fluxes = True
-        super(WGDJ0405NarrowLineFluxes, self).__init__(image_position_uncertainty, flux_uncertainties, normalized_magnifications,
+        super(WGDJ0405_HST, self).__init__(image_position_uncertainty, flux_uncertainties, normalized_magnifications,
                                                        uncertainty_in_fluxes, supersample_factor)
 
-class WGDJ0405JWST(_WGDJ0405):
+class WGDJ0405_JWST(_WGDJ0405):
 
     def __init__(self, supersample_factor=1):
 
@@ -105,6 +105,6 @@ class WGDJ0405JWST(_WGDJ0405):
         normalized_magnifications = np.array([1.00, 0.70, 1.07, 1.28])
         flux_uncertainties = np.array([0.03] * 3)
         uncertainty_in_fluxes = False
-        super(WGDJ0405JWST, self).__init__(image_position_uncertainty, flux_uncertainties,
+        super(WGDJ0405_JWST, self).__init__(image_position_uncertainty, flux_uncertainties,
                                                        normalized_magnifications,
                                                        uncertainty_in_fluxes, supersample_factor)

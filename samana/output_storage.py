@@ -348,9 +348,9 @@ class Output(object):
                 inds_keep = sorted_inds[0:keep_best_N]
         elif S_statistic_cut is not None:
             if select_worst:
-                inds_keep = np.where(self.flux_ratio_summary_statistic <= S_statistic_cut)[0]
-            else:
                 inds_keep = np.where(self.flux_ratio_summary_statistic >= S_statistic_cut)[0]
+            else:
+                inds_keep = np.where(self.flux_ratio_summary_statistic <= S_statistic_cut)[0]
         else:
             raise Exception('must specify keep_best_N, percentile_cut, or S_statistic_cut')
         return self._subsample(inds_keep)

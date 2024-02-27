@@ -54,3 +54,11 @@ class Mock6Model(MockModelBase):
         lens_model_params = [kwargs_lens_init, kwargs_lens_sigma, kwargs_lens_fixed, kwargs_lower_lens,
                              kwargs_upper_lens]
         return lens_model_list_macro, redshift_list_macro, index_lens_split, lens_model_params
+
+class Mock6ModelTrueSource(Mock6Model):
+
+    def setup_source_light_model(self):
+
+        ra_source = 0.09
+        dec_source = -0.045
+        return self._setup_true_source_light_model(ra_source, dec_source)

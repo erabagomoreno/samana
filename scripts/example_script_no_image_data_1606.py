@@ -10,7 +10,8 @@ job_index = int(sys.argv[1])
 data_class = PSJ1606JWST()
 model = PSJ1606ModelEPLM3M4Shear
 preset_model_name = 'WDM'
-kwargs_sample_realization = {'log10_sigma_sub': ['FIXED',np.log10(0.05)],
+kwargs_sample_realization = {
+    'log10_sigma_sub': ['FIXED',np.log10(0.05)],
                             'log_mc': ['UNIFORM', 4.0, 4.1]
                             }
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
