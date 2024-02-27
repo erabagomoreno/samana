@@ -25,7 +25,10 @@ class Mock23Model(MockModelBase):
                         a4_value_fixed=None, a3_value_fixed=None, delta_phi_m3_fixed=None):
 
         lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR']
-        kwargs_lens_macro = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': -0.09081663833534682, 'e2': 0.05080821749684399, 'gamma': 2.1579395230681304, 'a4_a': -0.007234861724844146, 'a3_a': -0.004637315438040289, 'delta_phi_m3': 0.01811430160503147, 'delta_phi_m4': 0.0}, {'gamma1': -0.005, 'gamma2': 0.07}]
+        kwargs_lens_macro = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.2, 'e2': 0.05080821749684399,
+                              'gamma': 2.1579395230681304, 'a4_a': -0.007234861724844146, 'a3_a': -0.004637315438040289,
+                              'delta_phi_m3': 0.01811430160503147, 'delta_phi_m4': 0.0},
+                             {'gamma1': -0.04, 'gamma2': 0.05}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1]
         if kwargs_lens_macro_init is not None:
