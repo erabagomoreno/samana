@@ -103,6 +103,7 @@ class J1537ModelEPLM3M4Shear(_J1537ModelBase):
                               'a3_a': 0.0,
                               'delta_phi_m3': 0.0, 'a4_a': 0.0,
                               'delta_phi_m4': 0.0}, 
+                              {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0, 'dec_0': 0}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1]
         if kwargs_lens_macro_init is not None:
