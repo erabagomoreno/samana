@@ -27,18 +27,8 @@ class J1537JWST(_J1537):
         :param magnifications: image magnifications; can also be a vector of 1s if tolerance is set to infintiy
         :param uncertainty_in_fluxes: bool; the uncertainties quoted are for fluxes or flux ratios
         """
-        #0,-1.993,-2.848,-0.750
-        #0,-0.329,1.644,1.763
-        #Acoords = np.array([0.0, 0.0])
-        #Bcoords = np.array([-1.993, -0.329])
-        #Ccoords = np.array([-2.848, 1.644]) 
-        #Dcoords = np.array([-0.750, 1.763])
-        #x = np.array([Acoords[0], Bcoords[0], Ccoords[0], Dcoords[0]])
-        #x_image = x - x.mean()
-        #y = np.array([Acoords[1], Bcoords[1], Ccoords[1], Dcoords[1]])
-        #y_image = y - y.mean()
-        x_image = np.array( [ 1.42556606, -0.56743394, -1.42243394,  0.67556606])
-        y_image = np.array( [-0.71662386, -1.04562386,  0.92737614,  1.04637614])
+        x_image = np.array( [ 1.42722809, -0.56577191, -1.42077191,  0.67722809])
+        y_image = np.array( [-0.71655342, -1.04555342,  0.92744658,  1.04644658])
         image_position_uncertainties = [0.005] * 4 # 5 arcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)

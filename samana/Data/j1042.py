@@ -1,19 +1,19 @@
 from samana.Data.data_base import QuadNoImageDataBase
 import numpy as np
 
-class _J0607(QuadNoImageDataBase):
+class _J1042(QuadNoImageDataBase):
 
     def __init__(self, x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                  uncertainty_in_fluxes):
 
-        z_lens = 0.5 #fiducial
-        z_source = 1.305
+        z_lens = 0.6 #0.59 in schmidt
+        z_source = 2.5
         # we use all three flux ratios to constrain the model
         keep_flux_ratio_index = [0, 1, 2]
-        super(_J0607, self).__init__(z_lens, z_source, x_image, y_image, magnifications, image_position_uncertainties,
+        super(_J1042, self).__init__(z_lens, z_source, x_image, y_image, magnifications, image_position_uncertainties,
                                        flux_uncertainties, uncertainty_in_fluxes, keep_flux_ratio_index)
 
-class J0607JWST(_J0607):
+class J1042JWST(_J1042):
 
     def __init__(self):
         """
@@ -25,10 +25,10 @@ class J0607JWST(_J0607):
         :param magnifications: image magnifications; can also be a vector of 1s if tolerance is set to infintiy
         :param uncertainty_in_fluxes: bool; the uncertainties quoted are for fluxes or flux ratios
         """
-        x_image=  np.array([-0.67058978, -0.53238823, -0.34850586,  0.61742581])
-        y_image=  np.array([-0.7192856,   0.41213327,  0.8118,      0.00952086])
-        image_position_uncertainties = [0.005] * 4 # 5 marcsec
+        x_image = np.array([-0.76930023,  0.81439063, 0.66778075, -0.00159419])
+        y_image = np.array([ 0.65240278,  0.10628356, -0.45875266, -0.80610109])
+        image_position_uncertainties = [0.005] * 4 # 5 arcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)
-        super(J0607JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
+        super(J1042JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=False)

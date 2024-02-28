@@ -103,24 +103,6 @@ class J2038ModelEPLM3M4Shear(_J2038ModelBase):
                               'delta_phi_m3': 0.0, 'a4_a': 0.0,
                               'delta_phi_m4': 0.0}, 
                              {'gamma1': 0.02223780213533988, 'gamma2': -0.044782587645082236, 'ra_0': 0, 'dec_0': 0}]
-        #[{'theta_E': 1.3780235432266594,
-        #                      'gamma': 2.0,
-        #                      'e1': -0.016594622027332865,
-        #                      'e2': 0.16171033865384316,
-        #                      'center_x': 0.1475794143581372,
-        #                      'center_y': 0.25175537997079345, 'a3_a': 0.0,
-        #                      'delta_phi_m3': 0.0, 'a4_a': 0.0,
-        #                      'delta_phi_m4': 0.0},
-        #                     {'gamma1': 0.038831457026621344,
-        #                      'gamma2': -0.02723879062223824,
-        #                      'ra_0': 0,
-        #                      'dec_0': 0}]
-        #kwargs_lens_macro = [{'theta_E': 0.7, 'gamma': 2.05, 'e1': -0.01,
-                             # 'e2': 0.07, 'center_x': 0.009601035223083986,
-                             # 'center_y': -0.06606995853487262, 'a3_a': 0.0,
-                             # 'delta_phi_m3': 0.0, 'a4_a': 0.0,
-                             # 'delta_phi_m4': 0.0},
-                             #{'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0.0, 'dec_0': 0.0}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1]
         if kwargs_lens_macro_init is not None:

@@ -5,11 +5,11 @@ import pickle
 
 #RK: I updated this to solve the lens equation for the JWST positions in the coordinates I'm using in the Data file
 
-class _J0659ModelBase(ModelBase):
+class _J1042ModelBase(ModelBase):
 
     def __init__(self, data_class, kde_sampler, shapelets_order):
         self._shapelets_order = shapelets_order
-        super(_J0659ModelBase, self).__init__(data_class, kde_sampler)
+        super(_J1042ModelBase, self).__init__(data_class, kde_sampler)
 
     def update_kwargs_fixed_macro(self, lens_model_list_macro, kwargs_lens_fixed, kwargs_lens_init, macromodel_samples_fixed=None):
        
@@ -106,26 +106,26 @@ class _J0659ModelBase(ModelBase):
                              }
         return kwargs_likelihood
 
-class J0659ModelEPLM3M4Shear(_J0659ModelBase):
+class J1042ModelEPLM3M4Shear(_J1042ModelBase):
 
     def __init__(self, data_class, kde_sampler=None, shapelets_order=None):
-        super(J0659ModelEPLM3M4Shear, self).__init__(data_class, kde_sampler, shapelets_order)
+        super(J1042ModelEPLM3M4Shear, self).__init__(data_class, kde_sampler, shapelets_order)
 
     @property
     def prior_lens(self):
-        return [[0, 'gamma', 1.89, 0.2], [0, 'a4_a', 0.0, 0.01], [0, 'a3_a', 0.0, 0.005]]
+        return [[0, 'gamma', 2.0, 0.2], [0, 'a4_a', 0.0, 0.01], [0, 'a3_a', 0.0, 0.005]]
 
     def setup_lens_model(self, kwargs_lens_macro_init=None, macromodel_samples_fixed=None):
 
         lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR', 'SIS']
-        kwargs_lens_macro = [{'theta_E': 2.4390862321468676, 'gamma': 2.0, 
-                              'e1': -0.11907526226667384, 'e2': -0.11568038045424757, 
-                              'center_x': 0.00032064417843797845, 'center_y': 3.604402441634382e-05,
-                              'a3_a': 0.0,
-                              'delta_phi_m3': 0.0, 'a4_a': 0.0,
-                              'delta_phi_m4': 0.}, 
-                              {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0, 'dec_0': 0},
-                              {'theta_E': 0.046, 'center_x':0.49368, 'center_y':1.51419}]
+        kwargs_lens_macro = [{'theta_E': 0.8898640885182896, 'gamma': 2, 
+                             'e1': -0.0059611633735585125, 'e2': 0.1654122426867683, 
+                             'center_x': 4.4476736137946233e-07, 'center_y': -3.659224374706812e-07,
+                             'a3_a': 0.0,
+                             'delta_phi_m3': 0.0, 'a4_a': 0.0,
+                             'delta_phi_m4': 0.0},
+                            {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0, 'dec_0': 0},
+                            {'theta_E':0.09,'center_x':1.655390631244123 ,'center_y':-0.29671644365160643}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1, 2]
         if kwargs_lens_macro_init is not None:

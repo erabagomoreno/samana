@@ -129,4 +129,5 @@ class PSJ1606_HST(_PSJ1606):
         flux_uncertainties = [0.03, 0.03, 0.02 / 0.6, 0.02 / 0.78]
         super(PSJ1606_HST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=True, supersample_factor=supersample_factor)
-
+       
+      

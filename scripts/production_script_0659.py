@@ -15,19 +15,19 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM',-2.5,-1.0],
                             'LOS_normalization': ['UNIFORM', 0.8,1.2],
                             'shmf_log_slope': ['GAUSSIAN',-1.9,0.05],
                             'truncation_model_subhalos': ['FIXED', 'TRUNCATION_GALACTICUS'], # specifies the tidal truncation model
-                            'host_scaling_factor': ['FIXED', 0.88], # formerly k1
-                            'redshift_scaling_factor': ['FIXED', 1.7] # formerly k2
+                            'host_scaling_factor': ['FIXED', 0.5], # formerly k1
+                            'redshift_scaling_factor': ['FIXED', 0.3] # formerly k2
                             }
 
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
 kwargs_sample_macro_fixed = {
-    'satellite_1_theta_E': ['GAUSSIAN', 0.2, 0.05],
-    'satellite_1_x': ['GAUSSIAN', -0.2841, 0.03],
-    'satellite_1_y': ['GAUSSIAN', -1.1753, 0.03],
+    'satellite_1_theta_E': ['UNIFORM',0.02 , 0.10],
+    'satellite_1_x': ['GAUSSIAN', 0.49368, 0.03],
+    'satellite_1_y': ['GAUSSIAN', 1.51419, 0.03],
     # 'a4_a': ['FIXED', data_class.a4a_true],
     # 'a3_a': ['FIXED', data_class.a3a_true],
      #'delta_phi_m3': ['FIXED', data_class.delta_phi_m3_true],
-    'gamma': ['FIXED', 1.89],
+    'gamma': ['GAUSSIAN', 2.0,0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
     'a3_a': ['GAUSSIAN', 0.0, 0.005],
     'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6]
@@ -36,7 +36,7 @@ kwargs_sample_macro_fixed = {
 job_name = 'j0659'
 use_imaging_data = False
 output_path = os.getcwd() + '/data/samana_jobs/'+job_name+'/'
-n_keep = 20
+n_keep = 20000
 tolerance = np.inf
 verbose = True
 random_seed_init = None
