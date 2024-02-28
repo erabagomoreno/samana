@@ -3,8 +3,6 @@ import numpy as np
 import pickle
 
 
-#RK: I updated this to solve the lens equation for the JWST positions in the coordinates I'm using in the Data file
-
 class _PSJ1606ModelBase(ModelBase):
 
     def __init__(self, data_class, kde_sampler, shapelets_order):
@@ -12,7 +10,7 @@ class _PSJ1606ModelBase(ModelBase):
         super(_PSJ1606ModelBase, self).__init__(data_class, kde_sampler)
 
     def update_kwargs_fixed_macro(self, lens_model_list_macro, kwargs_lens_fixed, kwargs_lens_init, macromodel_samples_fixed=None):
-       
+
         if macromodel_samples_fixed is not None:
             for param_fixed in macromodel_samples_fixed:
                 if param_fixed == 'satellite_1_theta_E':
@@ -118,14 +116,9 @@ class PSJ1606ModelEPLM3M4Shear(_PSJ1606ModelBase):
     def setup_lens_model(self, kwargs_lens_macro_init=None, macromodel_samples_fixed=None):
 
         lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR', 'SIS']
-        kwargs_lens_macro = [{'theta_E': 0.6990322090760723, 'gamma': 2.0, 
-                              'e1': -0.1726337342972964, 'e2': -0.07189083598251525, 
-                              'center_x': 8.200120536881359e-05, 'center_y': -5.163763123084199e-06,
-                              'a3_a': 0.0,
-                              'delta_phi_m3': 0.0, 'a4_a': 0.0,
-                              'delta_phi_m4': 0.0}, 
-                             {'gamma1': 0.09754793504464002, 'gamma2': 0.11868522209031938, 'ra_0': 0, 'dec_0': 0},
-                             {'theta_E':0.2, 'center_x':-0.2796427309664794, 'center_y':-1.1726679309655081}]
+        kwargs_lens_macro = [{'theta_E': 0.6315908767611849, 'gamma': 1.93, 'e1': 0.08070618277906448, 'e2': -0.006024272059613279, 'center_x': 0.06959737785768465, 'center_y': -0.04470274124093418, 'a3_a': 0.0, 'delta_phi_m3': 0.0, 'a4_a': 0.0, 'delta_phi_m4': 0.0},
+         {'gamma1': 0.10421285841808989, 'gamma2': 0.1128780834105226, 'ra_0': 0, 'dec_0': 0},
+         {'theta_E': 0.2, 'center_x': -0.2481, 'center_y': -1.1753}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1, 2]
         if kwargs_lens_macro_init is not None:
@@ -152,3 +145,4 @@ class PSJ1606ModelEPLM3M4Shear(_PSJ1606ModelBase):
         lens_model_params = [kwargs_lens_init, kwargs_lens_sigma, kwargs_lens_fixed, kwargs_lower_lens,
                              kwargs_upper_lens]
         return lens_model_list_macro, redshift_list_macro, index_lens_split, lens_model_params
+
