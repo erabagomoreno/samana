@@ -1,5 +1,5 @@
 from samana.forward_model import forward_model
-from samana.Data.wgdj0405_JWST import WGDJ0405JWST
+from samana.Data.wgdj0405 import WGDJ0405_JWST
 from samana.Model.wgdj0405_model import WGDJ0405ModelEPLM3M4Shear
 import os
 import numpy as np
@@ -7,7 +7,7 @@ import sys
 
 # set the job index for the run
 job_index = int(sys.argv[1])
-data_class = WGDJ0405JWST()
+data_class = WGDJ0405_JWST()
 model = WGDJ0405ModelEPLM3M4Shear
 preset_model_name = 'WDM'
 kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
@@ -21,9 +21,6 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
 
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
 kwargs_sample_macro_fixed = {
-    # 'a4_a': ['FIXED', data_class.a4a_true],
-    # 'a3_a': ['FIXED', data_class.a3a_true],
-     #'delta_phi_m3': ['FIXED', data_class.delta_phi_m3_true],
     'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
     'a3_a': ['GAUSSIAN', 0.0, 0.005],
