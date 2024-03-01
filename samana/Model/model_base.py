@@ -101,7 +101,7 @@ class ModelBase(object):
 
         _, _, _, lens_params = self.setup_lens_model(kwargs_lens_macro_init, macromodel_samples_fixed)
         _, source_params = self.setup_source_light_model()
-        _, lens_light_params = self.setup_lens_light_model()
+        lens_light_model_list, lens_light_params = self.setup_lens_light_model()
         _, ps_params = self.setup_point_source_model()
         kwargs_params = {'lens_model': lens_params,
                          'source_model': source_params,
@@ -131,7 +131,7 @@ class ModelBase(object):
         xD, yD, alpha_x_foreground, alpha_y_foreground, alpha_beta_subx, alpha_beta_suby = coordinates_and_deflections(
             lens_model_fixed, lens_model_free, kwargs_lens_fixed, kwargs_lens_free,
             x_grid, y_grid, z_split, z_source, cosmo_bkg)
-        kwargs_class_setup = class_setup(lens_model_free, xD, yD, alpha_x_foreground, \
+        kwargs_class_setup = decoupled_multiplane_class_setup(lens_model_free, xD, yD, alpha_x_foreground, \
                                          alpha_y_foreground, alpha_beta_subx, \
                                          alpha_beta_suby, z_split, \
                                          coordinate_type='GRID', \

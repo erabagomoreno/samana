@@ -7,7 +7,7 @@ class _J0608(QuadNoImageDataBase):
                  uncertainty_in_fluxes):
 
         z_lens = 0.5 #fiducial
-        z_source = 2.346
+        z_source = 2.35
         # we use all three flux ratios to constrain the model
         keep_flux_ratio_index = [0, 1, 2]
         super(_J0608, self).__init__(z_lens, z_source, x_image, y_image, magnifications, image_position_uncertainties,
@@ -31,4 +31,4 @@ class J0608JWST(_J0608):
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)
         super(J0608JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
-                                          uncertainty_in_fluxes=False)        
+                                          uncertainty_in_fluxes=False)
