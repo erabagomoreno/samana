@@ -7,7 +7,7 @@ import sys
 
 # set the job index for the run
 job_index = int(sys.argv[1])
-data_class = PSJ1606JWST()
+data_class = PSJ1606_JWST()
 model = PSJ1606ModelEPLM3M4Shear
 preset_model_name = 'WDM'
 kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM',-2.5,-1.0],
@@ -16,7 +16,8 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM',-2.5,-1.0],
                             'shmf_log_slope': ['GAUSSIAN',-1.9,0.05],
                             'truncation_model_subhalos': ['FIXED', 'TRUNCATION_GALACTICUS'], # specifies the tidal truncation model
                             'host_scaling_factor': ['FIXED', 0.5], # formerly k1
-                            'redshift_scaling_factor': ['FIXED', 0.3] # formerly k2
+                            'redshift_scaling_factor': ['FIXED', 0.3], # formerly k2
+                            'cone_opening_angle_arcsec': ['FIXED', 6.0]
                             }
 
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}

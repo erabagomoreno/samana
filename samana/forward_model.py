@@ -22,7 +22,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                   verbose=False, random_seed_init=None, readout_steps=2, write_sampling_rate=True,
                   n_pso_particles=10, n_pso_iterations=50, num_threads=1, astrometric_uncertainty=True,
                   resample_kwargs_lens=False, kde_sampler=None, image_data_grid_resolution_rescale=1.0,
-                  use_imaging_data=True, test_mode=False):
+                  use_imaging_data=True, fitting_sequence_kwargs=None, test_mode=False):
     """
 
     :param output_path:
@@ -51,6 +51,8 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
     :param resample_kwargs_lens:
     :param kde_sampler:
     :param image_data_grid_resolution_rescale:
+    :param use_imaging_data:
+    :param fitting_sequence_kwargs:
     :param test_mode:
     :return:
     """
@@ -128,7 +130,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                                             rescale_grid_size, rescale_grid_resolution, image_data_grid_resolution_rescale,
                                             verbose, random_seed, n_pso_particles, n_pso_iterations, num_threads,
                                             n_max_shapelets, astrometric_uncertainty, resample_kwargs_lens, kde_sampler,
-                                                                    use_imaging_data, test_mode)
+                                                                    use_imaging_data, fitting_sequence_kwargs, test_mode)
 
         seed_counter += 1
         acceptance_rate_counter += 1
@@ -251,7 +253,9 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                             kwargs_sample_source, kwargs_sample_macro_fixed, log_mlow_mass_sheets=6.0, rescale_grid_size=1.0,
                             rescale_grid_resolution=2.0, image_data_grid_resolution_rescale=1.0, verbose=False, seed=None,
                                    n_pso_particles=10, n_pso_iterations=50, num_threads=1, n_max_shapelets=None, astrometric_uncertainty=True,
-                                   resample_kwargs_lens=False, kde_sampler=None, use_imaging_data=True, test_mode=False):
+                                   resample_kwargs_lens=False, kde_sampler=None, use_imaging_data=True,
+                                   fitting_kwargs_list=None,
+                                   test_mode=False):
 
     # set the random seed for reproducibility
     np.random.seed(seed)
@@ -338,10 +342,11 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                                            kwargs_likelihood,
                                            kwargs_params,
                                            mpi=False, verbose=verbose)
-        fitting_kwargs_list = [
-            ['PSO', {'sigma_scale': 1., 'n_particles': n_pso_particles, 'n_iterations': n_pso_iterations,
-                     'threadCount': num_threads}]
-        ]
+        if fitting_kwargs_list is None:
+            fitting_kwargs_list = [
+                ['PSO', {'sigma_scale': 1., 'n_particles': n_pso_particles, 'n_iterations': n_pso_iterations,
+                         'threadCount': num_threads}]
+            ]
         chain_list = fitting_sequence.fit_sequence(fitting_kwargs_list)
         kwargs_result = fitting_sequence.best_fit()
         if verbose:

@@ -32,3 +32,12 @@ class J0659JWST(_J0659):
         magnifications = np.array([1.0] * 4)
         super(J0659JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=False)
+
+    @property
+    def coordinate_properties(self):
+        window_size = 8.0
+        deltaPix = 0.05
+        ra_at_xy_0 = -4.0
+        dec_at_xy_0 = -4.0
+        transform_pix2angle = np.array([[0.05, 0.], [0., 0.05]])
+        return deltaPix, ra_at_xy_0, dec_at_xy_0, transform_pix2angle, window_size

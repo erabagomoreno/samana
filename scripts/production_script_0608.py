@@ -16,8 +16,9 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
                             'shmf_log_slope': ['GAUSSIAN',-1.9,0.05],
                             'truncation_model_subhalos': ['FIXED', 'TRUNCATION_GALACTICUS'], # specifies the tidal truncation model
                             'host_scaling_factor': ['FIXED', 0.5], # formerly k1
-                            'redshift_scaling_factor': ['FIXED', 0.3] # formerly k2
-                            }
+                            'redshift_scaling_factor': ['FIXED', 0.3], # formerly k2
+                            'cone_opening_angle_arcsec': ['FIXED', 6.0]
+                             }
 
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
 kwargs_sample_macro_fixed = {
@@ -45,6 +46,7 @@ forward_model(output_path, job_index, n_keep, data_class, model, preset_model_na
                   kwargs_sample_realization, kwargs_sample_source, kwargs_sample_macro_fixed,
                tolerance, random_seed_init=random_seed_init,
               rescale_grid_resolution=2.0,
+              rescale_grid_size=2.0,
               # rescale_grid_resolution=2 lowers the resolution of the ray-tracing grid, which makes the calcuation
               # faster without a significant loss of precision as far as I can tell
               verbose=verbose, n_pso_particles=n_pso_particles,

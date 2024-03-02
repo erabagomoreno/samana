@@ -9,7 +9,7 @@ class _J0607ModelBase(ModelBase):
         super(_J0607ModelBase, self).__init__(data_class, kde_sampler)
 
     def update_kwargs_fixed_macro(self, lens_model_list_macro, kwargs_lens_fixed, kwargs_lens_init, macromodel_samples_fixed=None):
-       
+
         if macromodel_samples_fixed is not None:
             for param_fixed in macromodel_samples_fixed:
                 if param_fixed == 'satellite_1_theta_E':
@@ -115,13 +115,13 @@ class J0607ModelEPLM3M4Shear(_J0607ModelBase):
     def setup_lens_model(self, kwargs_lens_macro_init=None, macromodel_samples_fixed=None):
 
         lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR', 'SIS']
-        kwargs_lens_macro = [{'theta_E': 0.8050482808834879, 'gamma': 2.0, 
-                              'e1': 0.17947361594055541, 'e2': -0.1474096969700307, 
+        kwargs_lens_macro = [{'theta_E': 0.8050482808834879, 'gamma': 2.0,
+                              'e1': 0.17947361594055541, 'e2': -0.1474096969700307,
                               'center_x': 3.4171398431265786e-06, 'center_y': 4.309443111060081e-06,
                               'a4_a': 0.0,
-                              'a3_a': 0.0, 'delta_phi_m3': 0.0, 'delta_phi_m4': 0.0}, 
+                              'a3_a': 0.0, 'delta_phi_m3': 0.0, 'delta_phi_m4': 0.0},
                              {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0, 'dec_0': 0},
-                             {'theta_E': 0.3, 'center_x': -0.03660684072738696 , 'center_y': 0.24602286780288063}]
+                             {'theta_E': 0.1, 'center_x': -0.03660684072738696 , 'center_y': 0.24602286780288063}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1, 2]
         if kwargs_lens_macro_init is not None:

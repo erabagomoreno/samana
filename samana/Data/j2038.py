@@ -6,7 +6,7 @@ class _J2038(QuadNoImageDataBase):
     def __init__(self, x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                  uncertainty_in_fluxes):
 
-        z_lens = 0.23 
+        z_lens = 0.23
         z_source = 0.78
         # we use all three flux ratios to constrain the model
         keep_flux_ratio_index = [0, 1, 2]
@@ -32,3 +32,12 @@ class J2038JWST(_J2038):
         magnifications = np.array([1.0] * 4)
         super(J2038JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=False)
+
+    @property
+    def coordinate_properties(self):
+        window_size = 6.0
+        deltaPix = 0.05
+        ra_at_xy_0 = -3.0
+        dec_at_xy_0 = -3.0
+        transform_pix2angle = np.array([[0.05, 0.], [0., 0.05]])
+        return deltaPix, ra_at_xy_0, dec_at_xy_0, transform_pix2angle, window_size

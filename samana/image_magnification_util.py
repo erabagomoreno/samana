@@ -66,8 +66,9 @@ def magnification_finite_decoupled(source_model, kwargs_source, x_image, y_image
     """
     lens_model_fixed, lens_model_free, kwargs_lens_fixed, kwargs_lens_free, z_source, z_split, cosmo_bkg = \
         setup_lens_model(lens_model_init, kwargs_lens_init, index_lens_split)
-    grid_x_large, grid_y_large, interp_points_large, npix_large = setup_grids(grid_size, grid_resolution,
-                                                      0.0, 0.0)
+    grid_x_large, grid_y_large, interp_points_large, npix_large = setup_grids(grid_size,
+                                                                              grid_resolution,
+                                                                              0.0, 0.0)
     grid_r = np.sqrt(grid_x_large**2 + grid_y_large**2)
     grid_r = grid_r.ravel()
     grid_x_large = grid_x_large.ravel()
