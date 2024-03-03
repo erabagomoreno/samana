@@ -2,6 +2,8 @@ import numpy as np
 from samana.Data.Mocks.base import MockBase
 from samana.Data.ImageData.mock_23_cosmos import image_data as cosmos_image_data
 from samana.Data.ImageData.mock_23_cosmos_wdm import image_data as cosmos_image_data_wdm
+from samana.Data.ImageData.mock_23_cosmos_highSNR import image_data as cosmos_image_data_highSNR
+
 
 class Mock23Data(MockBase):
 
@@ -54,5 +56,31 @@ class Mock23DataWDM(MockBase):
         else:
             raise Exception('only cosmos source implemented for this class')
         super(Mock23DataWDM, self).__init__(z_lens, z_source, x_image, y_image,
+                                magnifications, astrometric_uncertainties, flux_ratio_uncertainties,
+                                image_data, super_sample_factor)
+
+class Mock23DataHighSNR(MockBase):
+
+    def __init__(self, super_sample_factor=1.0, cosmos_source=True):
+
+        z_lens = 0.45
+        z_source = 1.68
+        x_image = [-0.02219, 0.23754, 0.82754, -0.7676]
+        y_image = [-1.16441, 0.90357, 0.38062, 0.35362]
+        magnifications_true = [2.30308, 5.45543, 3.48139, 2.46878]
+        magnification_measurement_errors = 0.0
+        magnifications = np.array(magnifications_true) + np.array(magnification_measurement_errors)
+        astrometric_uncertainties = [0.003] * 4
+        flux_ratio_uncertainties = None
+
+        self.a3a_true = -0.0046
+        self.a4a_true = -0.00723
+        self.delta_phi_m3_true = 0.01811
+        self.delta_phi_m4_true = 0.0
+        if cosmos_source:
+            image_data = cosmos_image_data_highSNR
+        else:
+            raise Exception('only cosmos source implemented for this class')
+        super(Mock23DataHighSNR, self).__init__(z_lens, z_source, x_image, y_image,
                                 magnifications, astrometric_uncertainties, flux_ratio_uncertainties,
                                 image_data, super_sample_factor)
