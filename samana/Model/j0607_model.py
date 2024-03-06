@@ -115,12 +115,12 @@ class J0607ModelEPLM3M4Shear(_J0607ModelBase):
     def setup_lens_model(self, kwargs_lens_macro_init=None, macromodel_samples_fixed=None):
 
         lens_model_list_macro = ['EPL_MULTIPOLE_M3M4', 'SHEAR', 'SIS']
-        kwargs_lens_macro = [{'theta_E': 0.7760970639818237, 'gamma': 2.0,
-                              'e1': 0.050756331151527244, 'e2': 0.10491020066566459,
-                              'center_x': 5.501182688350892e-07, 'center_y': 1.3643471024600378e-08,
-                              'a4_a': 0.0, 'a3_a': 0.0, 'delta_phi_m3': 0.0, 'delta_phi_m4': 0.0},
-                              {'gamma1': 0.010304292416589459, 'gamma2': 0.026736939313574157, 'ra_0': 0, 'dec_0': 0},
-                              {'theta_E': 0.1144, 'center_x': 1.19838485283687, 'center_y': 0.2397138170015728}]
+        kwargs_lens_macro = [{'theta_E': 0.7934692111652356, 'center_x': -0.05106948900486165,
+                              'center_y': 0.04090779076037261, 'e1': 0.26244806739931537,
+                              'e2': 0.059955711822854744, 'gamma': 2.0, 'a3_a': 0.0, 'a4_a': 0.0,
+                              'delta_phi_m3': 0.0, 'delta_phi_m4': 0.0},
+                             {'gamma1': 0.08501281629520512, 'gamma2': -0.029543545243550302},
+                             {'theta_E': 0.1, 'center_x': 1.186951, 'center_y': 0.23248}]
         redshift_list_macro = [self._data.z_lens, self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1, 2]
         if kwargs_lens_macro_init is not None:

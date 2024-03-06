@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from samana.Data.data_base import QuadNoImageDataBase
 import numpy as np
 
@@ -25,8 +26,8 @@ class J0607JWST(_J0607):
         :param magnifications: image magnifications; can also be a vector of 1s if tolerance is set to infintiy
         :param uncertainty_in_fluxes: bool; the uncertainties quoted are for fluxes or flux ratios
         """
-        x_image = np.array([0.56440191, 0.70260346, 0.24231799, -0.72361368])
-        y_image = np.array([-0.72559465, 0.40582422, 0.80549095, 0.00321181])
+        x_image = np.array([ 0.55297075,  0.69117075,  0.23088775, -0.73502925])
+        y_image = np.array([-0.7328265,  0.3985935,  0.7982535, -0.0040205])
         image_position_uncertainties = [0.005] * 4 # 5 marcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)
