@@ -25,9 +25,6 @@ kwargs_sample_macro_fixed = {
     'satellite_1_theta_E': ['UNIFORM', 0.05, 0.15], # 1 pixel in imaging fit, 0.11 arcsec / pixel 0.5 pixel to 1.5 pixel range
      'satellite_1_x': ['GAUSSIAN', 1.19838485283687, 0.030],
     'satellite_1_y': ['GAUSSIAN', 0.2397138170015728, 0.030],
-    # 'a4_a': ['FIXED', data_class.a4a_true],
-    # 'a3_a': ['FIXED', data_class.a3a_true],
-     #'delta_phi_m3': ['FIXED', data_class.delta_phi_m3_true],
     'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
     'a3_a': ['GAUSSIAN', 0.0, 0.005],
@@ -49,6 +46,7 @@ forward_model(output_path, job_index, n_keep, data_class, model, preset_model_na
                   kwargs_sample_realization, kwargs_sample_source, kwargs_sample_macro_fixed,
                tolerance, random_seed_init=random_seed_init,
               rescale_grid_resolution=2.0,
+              rescale_grid_size=3.0,
               # rescale_grid_resolution=2 lowers the resolution of the ray-tracing grid, which makes the calcuation
               # faster without a significant loss of precision as far as I can tell
               verbose=verbose, n_pso_particles=n_pso_particles,

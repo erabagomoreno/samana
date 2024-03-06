@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from samana.Data.data_base import QuadNoImageDataBase
 import numpy as np
 
@@ -27,8 +28,10 @@ class J2026JWST(_J2026):
         """
         x_image = np.array([ 0.10035525,  0.51610375,  0.26439393, -0.46879818])
         y_image = np.array([ 0.89672252, -0.31479607, -0.53410103, -0.14806814])
+
         image_position_uncertainties = [0.005] * 4 # 5 marcsec
         flux_uncertainties = None
         magnifications = np.array([1.0] * 4)
         super(J2026JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=False)
+
