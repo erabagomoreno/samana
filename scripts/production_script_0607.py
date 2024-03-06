@@ -16,20 +16,20 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM',-2.5,-1.0],
                             'shmf_log_slope': ['GAUSSIAN',-1.9,0.05],
                             'truncation_model_subhalos': ['FIXED', 'TRUNCATION_GALACTICUS'], # specifies the tidal truncation model
                             'host_scaling_factor': ['FIXED', 0.5], # formerly k1
-                            'redshift_scaling_factor': ['FIXED', 0.3], # formerly k2
-                            'cone_opening_angle_arcsec': ['FIXED', 6.0]
-                             }
+                            'redshift_scaling_factor': ['FIXED', 0.3] # formerly k2
+                            }
 
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
 kwargs_sample_macro_fixed = {
     'satellite_1_theta_E': ['UNIFORM', 0.05, 0.15], # 1 pixel in imaging fit, 0.11 arcsec / pixel 0.5 pixel to 1.5 pixel range
-     'satellite_1_x': ['GAUSSIAN', 1.19838485283687, 0.030],
-    'satellite_1_y': ['GAUSSIAN', 0.2397138170015728, 0.030],
+     'satellite_1_x': ['GAUSSIAN', 1.186951, 0.030],
+    'satellite_1_y': ['GAUSSIAN', 0.23248, 0.030],
     'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
     'a3_a': ['GAUSSIAN', 0.0, 0.005],
     'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6]
 }
+
 
 job_name = 'j0607'
 use_imaging_data = False
