@@ -9,59 +9,6 @@ from lenstronomy.Plots import chain_plot
 from trikde.pdfs import IndependentLikelihoods
 
 
-# code for turbocharging paper conducted with commit version dde303b
-def inference(mock_lens_data_list, param_names_plot, param_names_macro_plot, keep_lens_index, simulation_list,
-              kwargs_density, flux_ratio_measurement_uncertainty,
-            imaging_data_likelihood=True,
-            imaging_data_hard_cut=False,
-             imaging_data_likelihood_scale=10.0,
-              percentile_cut_image_data=None,
-              n_resample=0, n_keep_S_statistic=None, ABC_flux_ratio_likelihood=True,
-              S_statistic_tolerance=None, make_plot=False):
-
-    _output_list = []
-    pdf_list = []
-
-    for mock_lens_index in keep_lens_index:
-
-        mock_data_class = mock_lens_data_list[mock_lens_index - 1]
-        print('number of samples in mock ' + str(mock_lens_index) + ': ',
-              str(np.round(simulation_list[mock_lens_index - 1].parameters.shape[0] / 1e6, 2)) + ' million')
-        kwargs_pdf = {'ABC_flux_ratio_likelihood': ABC_flux_ratio_likelihood,
-                      'flux_ratio_uncertainty_percentage': [flux_ratio_measurement_uncertainty] * 3,
-                      'uncertainty_in_flux_ratios': True,
-                      'imaging_data_likelihood': imaging_data_likelihood,
-                      'imaging_data_hard_cut': imaging_data_hard_cut,
-                      'percentile_cut_image_data': percentile_cut_image_data,
-                      'imaging_data_likelihood_scale': imaging_data_likelihood_scale,
-                      'n_keep_S_statistic': n_keep_S_statistic,
-                      'S_statistic_tolerance': S_statistic_tolerance,
-                      'perturb_measurements': True
-                      }
-        if flux_ratio_measurement_uncertainty <= 0.001:
-            n_resample = 0
-        _density, _output, _ = simulation_output_to_density(deepcopy(simulation_list[mock_lens_index - 1]),
-                                                            deepcopy(mock_data_class),
-                                                            param_names_plot,
-                                                            kwargs_pdf,
-                                                            kwargs_density,
-                                                            param_names_macro_plot,
-                                                            n_resample=n_resample)
-        _output_list.append(_output)
-        pdf_list.append(_density)
-        if S_statistic_tolerance is not None and n_keep_S_statistic is None:
-            print('number of samples after cut on S statistic: ', len(_output.flux_ratio_summary_statistic))
-    if make_plot:
-        fig = plt.figure()
-        fig.set_size_inches(8, 6)
-        ax = plt.subplot(111)
-        for _out in _output_list:
-            ax.hist(_out.flux_ratio_summary_statistic, label='Lens ' + str(mock_lens_index), bins=20, range=(0.0, 0.15),
-                    alpha=0.5)
-        ax.legend(fontsize=14)
-        ax.set_xlim(0.0, 0.15)
-    return IndepdendentLikelihoods(pdf_list), _output_list
-
 def nmax_bic_minimize(data, model_class, fitting_kwargs_list, n_max_list, verbose=True, make_plots=False):
     """
 

@@ -1,8 +1,8 @@
 import numpy as np
 from samana.Data.Mocks.base import MockBase
-from samana.Data.ImageData.mock_23_cosmos import image_data as cosmos_image_data
-from samana.Data.ImageData.mock_23_cosmos_wdm import image_data as cosmos_image_data_wdm
-from samana.Data.ImageData.mock_23_cosmos_highSNR import image_data as cosmos_image_data_highSNR
+from samana.Data.ImageData.MockImageData.mock_23_cosmos import image_data as cosmos_image_data
+from samana.Data.ImageData.MockImageData.mock_23_cosmos_wdm import image_data as cosmos_image_data_wdm
+from samana.Data.ImageData.MockImageData.mock_23_cosmos_highSNR import image_data as cosmos_image_data_highSNR
 
 
 class Mock23Data(MockBase):

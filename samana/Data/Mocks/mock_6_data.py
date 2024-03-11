@@ -1,10 +1,10 @@
 import numpy as np
 from samana.Data.Mocks.base import MockBase
-from samana.Data.ImageData.mock_6_simple import image_data as simple_image_data
-from samana.Data.ImageData.mock_6_cosmos import image_data as cosmos_image_data
-from samana.Data.ImageData.mock_6_2038 import image_data as simulated_2038_image_data
-from samana.Data.ImageData.mock_6_cosmos_wdm import image_data as cosmos_image_data_wdm
-from samana.Data.ImageData.mock_6_cosmos_highSNR import image_data as cosmos_image_data_highSNR
+from samana.Data.ImageData.MockImageData.mock_6_simple import image_data as simple_image_data
+from samana.Data.ImageData.MockImageData.mock_6_cosmos import image_data as cosmos_image_data
+from samana.Data.ImageData.MockImageData.mock_6_2038 import image_data as simulated_2038_image_data
+from samana.Data.ImageData.MockImageData.mock_6_cosmos_wdm import image_data as cosmos_image_data_wdm
+from samana.Data.ImageData.MockImageData.mock_6_cosmos_highSNR import image_data as cosmos_image_data_highSNR
 
 
 class Mock6Data(MockBase):

@@ -1,8 +1,8 @@
 import numpy as np
 from samana.Data.Mocks.base import MockBase
-from samana.Data.ImageData.mock_7_simple import image_data as simple_image_data
-from samana.Data.ImageData.mock_7_cosmos import image_data as cosmos_image_data
-from samana.Data.ImageData.mock_7_cosmos_wdm import image_data as cosmos_image_data_wdm
+from samana.Data.ImageData.MockImageData.mock_7_simple import image_data as simple_image_data
+from samana.Data.ImageData.MockImageData.mock_7_cosmos import image_data as cosmos_image_data
+from samana.Data.ImageData.MockImageData.mock_7_cosmos_wdm import image_data as cosmos_image_data_wdm
 
 
 class Mock7Data(MockBase):

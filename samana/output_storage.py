@@ -198,10 +198,10 @@ class Output(object):
         return samples
 
     @classmethod
-    def from_raw_output(cls, output_path, job_index_min, job_index_max, fitting_kwargs_list=None):
+    def from_raw_output(cls, output_path, job_index_min, job_index_max, fitting_kwargs_list=None,
+                        macromodel_sample_names=None):
 
         param_names = None
-        macro_param_names = None
         init = True
         for i in range(job_index_min, job_index_max+1):
 
@@ -235,7 +235,7 @@ class Output(object):
                 with open(folder + 'parameters.txt', 'r') as f:
                     param_names = f.readlines(1)[0].split()
                 f.close()
-            if macro_param_names is None:
+            if macromodel_sample_names is None:
                 with open(folder + 'macromodel_samples.txt', 'r') as f:
                     macromodel_sample_names = f.readlines(1)[0].split()
                 f.close()

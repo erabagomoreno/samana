@@ -441,7 +441,7 @@ class PowerLawFreeShearMultipole_34(PowerLawParamManager):
 
 class EPLMultipole34FixedShear(PowerLawFixedShear):
 
-    def __init__(self, kwargs_lens_init, shear_strength, a4a_init, a3a_init, delta_phi_m3):
+    def __init__(self, kwargs_lens_init, shear_strength, a4a_init, a3a_init, delta_phi_m3, delta_phi_m4):
 
         """
 
@@ -453,7 +453,7 @@ class EPLMultipole34FixedShear(PowerLawFixedShear):
         self._a4a_init = a4a_init
         self._a3a_init = a3a_init
         self._delta_phi_m3 = delta_phi_m3
-        self._delta_phi_m4 = 0.0
+        self._delta_phi_m4 = delta_phi_m4
         self._idx_m4 = 0
         self._idx_m3 = 0
         super(EPLMultipole34FixedShear, self).__init__(kwargs_lens_init, shear_strength)
@@ -475,7 +475,7 @@ class EPLMultipole34FixedShear(PowerLawFixedShear):
 
 class EPLMultipole34FreeShear(PowerLawParamManager):
 
-    def __init__(self, kwargs_lens_init, a4a_init, a3a_init, delta_phi_m3):
+    def __init__(self, kwargs_lens_init, a4a_init, a3a_init, delta_phi_m3, delta_phi_m4):
         """
 
         :param kwargs_lens_init: the initial kwargs_lens before optimizing
@@ -486,7 +486,7 @@ class EPLMultipole34FreeShear(PowerLawParamManager):
         self._a4a_init = a4a_init
         self._a3a_init = a3a_init
         self._delta_phi_m3 = delta_phi_m3
-        self._delta_phi_m4 = 0.0
+        self._delta_phi_m4 = delta_phi_m4
         self._idx_m4 = 0
         self._idx_m3 = 0
         super(EPLMultipole34FreeShear, self).__init__(kwargs_lens_init)
@@ -523,17 +523,23 @@ def auto_param_class(lens_model_list_macro, kwargs_lens_init, macromodel_samples
             raise Exception(
                 'when specifying a param class with an m=3 multi-pole moment, the orientation of the multi-moment '
                 'must be sampled from a prior specified with keyword arguement delta_phi_m3')
+        if 'delta_phi_m4' not in macromodel_samples_fixed_param_names:
+            raise Exception(
+                'when specifying a param class with an m=4 multi-pole moment, the orientation of the multi-moment '
+                'must be sampled from a prior specified with keyword arguement delta_phi_m4')
         if 'gamma_ext' in macromodel_samples_fixed_param_names:
             param_class = EPLMultipole34FixedShear(kwargs_lens_init,
                                                    macromodel_samples_fixed_dict['gamma_ext'],
                                                    macromodel_samples_fixed_dict['a4_a'],
                                                    macromodel_samples_fixed_dict['a3_a'],
-                                                   macromodel_samples_fixed_dict['delta_phi_m3'])
+                                                   macromodel_samples_fixed_dict['delta_phi_m3'],
+                                                   macromodel_samples_fixed_dict['delta_phi_m4'])
         else:
             param_class = EPLMultipole34FreeShear(kwargs_lens_init,
                                                   macromodel_samples_fixed_dict['a4_a'],
                                                   macromodel_samples_fixed_dict['a3_a'],
-                                                  macromodel_samples_fixed_dict['delta_phi_m3'])
+                                                  macromodel_samples_fixed_dict['delta_phi_m3'],
+                                                  macromodel_samples_fixed_dict['delta_phi_m4'])
 
     else:
         raise Exception('this functionality only implemented for EPL_MULTIPOLE_M3M4 plus shear model')

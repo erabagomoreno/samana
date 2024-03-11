@@ -21,22 +21,17 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM',-2.5,-1.0],
 
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
 kwargs_sample_macro_fixed = {
-    'satellite_1_theta_E': ['UNIFORM',0.02 , 0.10],
-    'satellite_1_x': ['GAUSSIAN', 0.49368, 0.03],
-    'satellite_1_y': ['GAUSSIAN', 1.51419, 0.03],
-    # 'a4_a': ['FIXED', data_class.a4a_true],
-    # 'a3_a': ['FIXED', data_class.a3a_true],
-     #'delta_phi_m3': ['FIXED', data_class.delta_phi_m3_true],
-    'gamma': ['GAUSSIAN', 2.0,0.1],
+        'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
     'a3_a': ['GAUSSIAN', 0.0, 0.005],
-    'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6]
+    'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6],
+    'delta_phi_m4': ['UNIFORM', -np.pi/8, np.pi/8]
 }
 
 job_name = 'j0659'
 use_imaging_data = False
-output_path = os.getcwd() + '/data/samana_jobs/'+job_name+'/'
-n_keep = 20000
+output_path = os.getenv('SCRATCH') + '/chains/'+job_name+'/'
+n_keep = 500
 tolerance = np.inf
 verbose = True
 random_seed_init = None
@@ -48,6 +43,7 @@ forward_model(output_path, job_index, n_keep, data_class, model, preset_model_na
                   kwargs_sample_realization, kwargs_sample_source, kwargs_sample_macro_fixed,
                tolerance, random_seed_init=random_seed_init,
               rescale_grid_resolution=2.0,
+              rescale_grid_size=3.0,
               # rescale_grid_resolution=2 lowers the resolution of the ray-tracing grid, which makes the calcuation
               # faster without a significant loss of precision as far as I can tell
               verbose=verbose, n_pso_particles=n_pso_particles,

@@ -25,16 +25,17 @@ kwargs_sample_macro_fixed = {
     'satellite_1_theta_E': ['GAUSSIAN', 0.2, 0.05],
     'satellite_1_x': ['GAUSSIAN', -0.2481, 0.03],
     'satellite_1_y': ['GAUSSIAN', -1.1753, 0.03],
-    'gamma': ['GAUSSIAN', 2.0, 0.1],
+        'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
     'a3_a': ['GAUSSIAN', 0.0, 0.005],
-    'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6]
+    'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6],
+    'delta_phi_m4': ['UNIFORM', -np.pi/8, np.pi/8]
 }
 
 job_name = 'psj1606'
 use_imaging_data = False
-output_path = os.getcwd() + '/data/samana_jobs/'+job_name+'/'
-n_keep = 20000
+output_path = os.getenv('SCRATCH') + '/chains/'+job_name+'/'
+n_keep = 500
 tolerance = np.inf
 verbose = True
 random_seed_init = None

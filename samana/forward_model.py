@@ -324,7 +324,6 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
         kwargs_halos=kwargs_halos,
         verbose=verbose,
         macromodel_samples_fixed=macromodel_samples_fixed_dict)
-
     kwargs_constraints = model_class.kwargs_constraints
     kwargs_likelihood = model_class.kwargs_likelihood
     if astrometric_uncertainty:
@@ -371,9 +370,11 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                                              lens_model_init,
                                              kwargs_lens_init,
                                              index_lens_split,
-                                             param_class
+                                             param_class,
+                                             tol_simplex_func=1e-5,
+                                             simplex_n_iterations=500
                                              )
-        kwargs_solution, _ = opt.optimize(25, 50, verbose=verbose)
+        kwargs_solution, _ = opt.optimize(50, 100, verbose=verbose)
         lens_model = LensModel(lens_model_list=kwargs_model['lens_model_list'],
                                lens_redshift_list=kwargs_model['lens_redshift_list'],
                                multi_plane=kwargs_model['multi_plane'],
@@ -390,7 +391,6 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
 
     source_x, source_y = lens_model.ray_shooting(data_class.x_image, data_class.y_image,
                                                  kwargs_solution)
-
     source_model_quasar, kwargs_source = setup_gaussian_source(source_dict['source_size_pc'],
                                                                np.mean(source_x), np.mean(source_y),
                                                                astropy_cosmo, data_class.z_source)

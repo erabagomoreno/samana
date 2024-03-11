@@ -1,13 +1,13 @@
 from samana.forward_model import forward_model
-from samana.Data.j2038 import J2038JWST
-from samana.Model.j2038_model import J2038ModelEPLM3M4Shear
+from samana.Data.wgd2038 import WGD2038_JWST
+from samana.Model.wgd2038_model import J2038ModelEPLM3M4Shear
 import os
 import numpy as np
 import sys
 
 # set the job index for the run
 job_index = int(sys.argv[1])
-data_class = J2038JWST()
+data_class = WGD2038_JWST()
 model = J2038ModelEPLM3M4Shear
 preset_model_name = 'WDM'
 kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
@@ -22,16 +22,17 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
 
 kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
 kwargs_sample_macro_fixed = {
-    'gamma': ['GAUSSIAN', 2.0, 0.1],
+        'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
     'a3_a': ['GAUSSIAN', 0.0, 0.005],
-    'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6]
+    'delta_phi_m3': ['UNIFORM', -np.pi/6, np.pi/6],
+    'delta_phi_m4': ['UNIFORM', -np.pi/8, np.pi/8]
 }
 
 job_name = 'j2038'
 use_imaging_data = False
-output_path = os.getcwd() + '/data/samana_jobs/'+job_name+'/'
-n_keep = 20000
+output_path = os.getenv('SCRATCH') + '/chains/'+job_name+'/'
+n_keep = 500
 tolerance = np.inf
 verbose = True
 random_seed_init = None

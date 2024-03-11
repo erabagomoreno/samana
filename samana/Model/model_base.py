@@ -11,6 +11,34 @@ class ModelBase(object):
         self._data = data_class
         self.kde_sampler = kde_sampler
 
+    def gaussian_source_clump(self, beta_x, beta_y, sigma_x, sigma_y):
+
+        source_model_list = ['GAUSSIAN_ELLIPSE']
+        kwargs_source = [{'amp': 1.0, 'sigma': 0.0025, 'center_x': beta_x, 'center_y': beta_y, 'e1': 0.0, 'e2': 0.0}]
+        kwargs_source_sigma = [
+            {'amp': 10.0, 'sigma': 0.005, 'center_x': sigma_x, 'center_y': sigma_y, 'e1': 0.1, 'e2': 0.1}]
+        kwargs_lower_source = [
+            {'amp': 0.00001, 'sigma': 0.00000001, 'center_x': beta_x - 5 * sigma_x, 'center_y': beta_y - 5 * sigma_y,
+             'e1': -0.5, 'e2': -0.5}]
+        kwargs_upper_source = [
+            {'amp': 100, 'sigma': 0.01, 'center_x': beta_x + 5 * sigma_x, 'center_y': beta_y + 5 * sigma_y,
+             'e1': 0.5, 'e2': 0.5}]
+        kwargs_source_fixed = [{}]
+        return source_model_list, kwargs_source, kwargs_source_sigma, kwargs_source_fixed, kwargs_lower_source, kwargs_upper_source
+
+    def shapetlet_source_clump(self, beta_x, beta_y, sigma_x, sigma_y, n_max_clump=4):
+
+        source_model_list = ['SHAPELETS']
+        kwargs_source = [{'amp': 1.0, 'beta': 0.005, 'center_x': beta_x, 'center_y': beta_y, 'n_max': n_max_clump}]
+        kwargs_source_sigma = [{'amp': 1.0, 'beta': 0.005, 'center_x': 0.05, 'center_y': 0.05, 'n_max': 1}]
+        kwargs_lower_source = [
+            {'amp': 1e-9, 'beta': 0.0, 'center_x': beta_x - 5 * sigma_x, 'center_y': beta_y - 5 * sigma_y, 'n_max': 0}]
+        kwargs_upper_source = [{'amp': 100.0, 'beta': 0.05, 'center_x': beta_x + 5 * sigma_x, 'center_y': beta_y + 5 * sigma_y,
+                                'n_max': n_max_clump + 1}]
+        kwargs_source_fixed = [{'n_max': n_max_clump}]
+        return source_model_list, kwargs_source, kwargs_source_sigma, kwargs_source_fixed, \
+               kwargs_lower_source, kwargs_upper_source
+
     def setup_point_source_model(self):
         point_source_model_list = ['LENSED_POSITION']
         kwargs_ps_init = [{'ra_image': self._data.x_image, 'dec_image': self._data.y_image}]
@@ -41,13 +69,16 @@ class ModelBase(object):
 
     def setup_kwargs_model(self, decoupled_multiplane=False, lens_model_list_halos=None,
                            redshift_list_halos=None, kwargs_halos=None, kwargs_lens_macro_init=None,
-                           grid_resolution=0.05, verbose=False, macromodel_samples_fixed=None):
+                           grid_resolution=0.05, verbose=False, macromodel_samples_fixed=None,
+                           observed_convention_index=None):
 
         lens_model_list_macro, redshift_list_macro, _, _ = self.setup_lens_model(kwargs_lens_macro_init,
                                                                                  macromodel_samples_fixed)
         source_model_list, _ = self.setup_source_light_model()
         lens_light_model_list, _ = self.setup_lens_light_model()
         point_source_list, _ = self.setup_point_source_model()
+        if observed_convention_index is not None:
+            assert decoupled_multiplane is False
         kwargs_model = {'lens_model_list': lens_model_list_macro,
                         'lens_redshift_list': redshift_list_macro,
                         'multi_plane': True,
@@ -58,7 +89,8 @@ class ModelBase(object):
                         'lens_light_model_list': lens_light_model_list,
                         'point_source_model_list': point_source_list,
                         'additional_images_list': [False],
-                        'fixed_magnification_list': [True]}
+                        'fixed_magnification_list': [True],
+                        'observed_convention_index': observed_convention_index}
         lens_model_init, kwargs_lens_init, index_lens_split = None, None, None
         if decoupled_multiplane:
             if verbose:
@@ -84,8 +116,8 @@ class ModelBase(object):
             delta_y_image = [0.0] * len(self._data.y_image)
         special_init = {'delta_x_image': delta_x_image,
                         'delta_y_image': delta_y_image}
-        special_sigma = {'delta_x_image': [0.001] * 4,
-                         'delta_y_image': [0.001] * 4}
+        special_sigma = {'delta_x_image': [0.005] * 4,
+                         'delta_y_image': [0.005] * 4}
         special_lower = {'delta_x_image': [-1.0] * 4,
                          'delta_y_image': [-1.0] * 4}
         special_upper = {'delta_x_image': [1.0] * 4,
