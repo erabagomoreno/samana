@@ -374,7 +374,7 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                                              tol_simplex_func=1e-5,
                                              simplex_n_iterations=500
                                              )
-        kwargs_solution, _ = opt.optimize(50, 100, verbose=verbose)
+        kwargs_solution, _ = opt.optimize(20, 50, verbose=verbose, seed=seed)
         lens_model = LensModel(lens_model_list=kwargs_model['lens_model_list'],
                                lens_redshift_list=kwargs_model['lens_redshift_list'],
                                multi_plane=kwargs_model['multi_plane'],
