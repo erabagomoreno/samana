@@ -99,8 +99,8 @@ class PSJ1606_JWST(_PSJ1606):
         x_image += x_offset
         y_image += y_offset
         image_position_uncertainties = [0.005] * 4
-        flux_uncertainties = None
-        magnifications = np.array([1.0] * 4)
+        flux_uncertainties = [0.02/1.01, 0.01/0.59, 0.02/0.75]
+        magnifications = np.array([1.0, 1.01, 0.59, 0.75])
         super(PSJ1606_JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=False, supersample_factor=supersample_factor)
 

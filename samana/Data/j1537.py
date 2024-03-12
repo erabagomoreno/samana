@@ -30,8 +30,8 @@ class J1537JWST(_J1537):
         x_image = np.array( [ 1.42722809, -0.56577191, -1.42077191,  0.67722809])
         y_image = np.array( [-0.71655342, -1.04555342,  0.92744658,  1.04644658])
         image_position_uncertainties = [0.005] * 4 # 5 arcsec
-        flux_uncertainties = None
-        magnifications = np.array([1.0] * 4)
+        flux_uncertainties = [0.02/0.73, 0.02/0.94, 0.02/0.73]
+        magnifications = np.array([1.0, 0.73, 0.94, 0.73])
         super(J1537JWST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                                 uncertainty_in_fluxes=False)
 

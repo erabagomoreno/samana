@@ -121,7 +121,7 @@ class J0607ModelEPLM3M4Shear(_J0607ModelBase):
                               'delta_phi_m3': 0.0, 'delta_phi_m4': 0.0},
                              {'gamma1': 0.08501281629520512, 'gamma2': -0.029543545243550302},
                              {'theta_E': 0.1, 'center_x': 1.18695, 'center_y': 0.2324}]
-        redshift_list_macro = [self._data.z_lens, self._data.z_lens]
+        redshift_list_macro = [self._data.z_lens, self._data.z_lens, self._data.z_lens]
         index_lens_split = [0, 1, 2]
         if kwargs_lens_macro_init is not None:
             for i in range(0, len(kwargs_lens_macro_init)):
@@ -131,7 +131,7 @@ class J0607ModelEPLM3M4Shear(_J0607ModelBase):
         kwargs_lens_sigma = [{'theta_E': 0.05, 'center_x': 0.1, 'center_y': 0.1, 'e1': 0.2, 'e2': 0.2, 'gamma': 0.1,
                               'a4_a': 0.01, 'a3_a': 0.005, 'delta_phi_m3': np.pi/12, 'delta_phi_m4': np.pi/16},
                              {'gamma1': 0.05, 'gamma2': 0.05}, {'theta_E': 0.1, 'center_x': 0.02, 'center_y': 0.02}]
-        kwargs_lens_fixed = [{}, {'ra_0': 0.0, 'dec_0': 0.0}]
+        kwargs_lens_fixed = [{}, {'ra_0': 0.0, 'dec_0': 0.0}, {}]
         kwargs_lower_lens = [
             {'theta_E': 0.05, 'center_x': -10.0, 'center_y': -10.0, 'e1': -0.5, 'e2': -0.5, 'gamma': 1.5, 'a4_a': -0.1,
              'a3_a': -0.1, 'delta_phi_m3': -np.pi/6, 'delta_phi_m4': -10.0},
