@@ -29,7 +29,7 @@ class ImagingDataBase(object):
         self._y_image_init = np.array(y_image)
         self._x = np.array(x_image)
         self._y = np.array(y_image)
-        self.magnifications = magnifications
+        self.magnifications = np.array(magnifications)
         self.image_position_uncertainty = image_position_uncertainties
         if len(self.image_position_uncertainty) != len(self._x_image_init):
             raise Exception('image position uncertainties must have the same shape as point source arrays')
