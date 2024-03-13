@@ -3,14 +3,9 @@ from scipy.stats.kde import gaussian_kde
 from scipy.interpolate import interp1d
 from lenstronomy.LensModel.lens_model import LensModel
 from lenstronomy.LensModel.Solver.solver4point import Solver4Point
-from lenstronomy.LensModel.QuadOptimizer.optimizer import Optimizer
 from copy import deepcopy
-from pyHalo.preset_models import preset_model_from_name
-from lenstronomy.Util.magnification_finite_util import auto_raytracing_grid_resolution, auto_raytracing_grid_size
-from samana.image_magnification_util import setup_gaussian_source
-from time import time
-# from lenstronomy.LensModel.QuadOptimizer.optimizer import Optimizer
-# from lenstronomy.LensModel.QuadOptimizer.param_manager import PowerLawParamManager
+from samana.Model.multipole_prior import OpticalMultipolePrior
+
 
 class KwargsLensSampler(object):
 
@@ -34,26 +29,43 @@ def sample_prior(kwargs_prior):
     prior_samples_dict = {}
     sample_list = []
     sample_names = []
+    joint_multipole_prior_used = False
     for param_name in kwargs_prior.keys():
-        prior_type = kwargs_prior[param_name][0]
-
-        if prior_type == 'FIXED':
-            sample = kwargs_prior[param_name][1]
-            prior_samples_dict[param_name] = sample
-            continue
-
-        if prior_type == 'UNIFORM':
-            param_min, param_max = kwargs_prior[param_name][1], kwargs_prior[param_name][2]
-            sample = np.random.uniform(param_min, param_max)
-        elif prior_type == 'GAUSSIAN':
-            mean, standard_dev = kwargs_prior[param_name][1], kwargs_prior[param_name][2]
-            sample = np.random.normal(mean, standard_dev)
+        if param_name == 'OPTICAL_MULTIPOLE_PRIOR':
+            pdf = OpticalMultipolePrior()
+            if len(kwargs_prior[param_name]) == 0:
+                q_mean, q_sigma = None, None
+            else:
+                q_mean, q_sigma = kwargs_prior[param_name][0], kwargs_prior[param_name][1]
+            print(q_mean, q_sigma)
+            a3a, delta_phi_m3, a4a, delta_phi_m4 = pdf.sample(q_mean, q_sigma)
+            prior_samples_dict['a3_a'] = a3a
+            prior_samples_dict['a4_a'] = a4a
+            prior_samples_dict['delta_phi_m3'] = delta_phi_m3
+            prior_samples_dict['delta_phi_m4'] = delta_phi_m4
+            sample_list += [a3a, a4a, delta_phi_m3, delta_phi_m4]
+            sample_names += ['a3_a', 'a4_a', 'delta_phi_m3', 'delta_phi_m4']
+            joint_multipole_prior_used = True
         else:
-            raise Exception('only UNIFORM, GAUSSIAN, and FIXED priors currently implemented')
-
-        prior_samples_dict[param_name] = sample
-        sample_list.append(sample)
-        sample_names.append(param_name)
+            prior_type = kwargs_prior[param_name][0]
+            if prior_type == 'FIXED':
+                sample = kwargs_prior[param_name][1]
+                prior_samples_dict[param_name] = sample
+                continue
+            elif prior_type == 'UNIFORM':
+                param_min, param_max = kwargs_prior[param_name][1], kwargs_prior[param_name][2]
+                sample = np.random.uniform(param_min, param_max)
+            elif prior_type == 'GAUSSIAN':
+                mean, standard_dev = kwargs_prior[param_name][1], kwargs_prior[param_name][2]
+                sample = np.random.normal(mean, standard_dev)
+            else:
+                raise Exception('only UNIFORM, GAUSSIAN, and FIXED priors currently implemented')
+            if joint_multipole_prior_used and param_name in ['a3_a', 'a4_a', 'delta_phi_m3', 'delta_phi_m3']:
+                raise Exception('you have specified a prior on multipole moments separately '
+                                 'from JOINT_MULTIPOLE_PRIOR, which is not currently allowed!')
+            prior_samples_dict[param_name] = sample
+            sample_list.append(sample)
+            sample_names.append(param_name)
 
     return prior_samples_dict, np.array(sample_list), sample_names
 
