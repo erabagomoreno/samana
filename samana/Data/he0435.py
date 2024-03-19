@@ -1,20 +1,29 @@
 from samana.Data.data_base import ImagingDataBase
 import numpy as np
 from samana.Data.ImageData.he0435_814w import image_data, psf_error_map, psf_model
+from samana.Data.ImageData.he0435_f555W import image_data as image_data_f555w
+from samana.Data.ImageData.he0435_f555W import psf_model as psf_model_f555w
+from samana.Data.ImageData.he0435_f555W import psf_error_map as psf_error_map_f555w
 
 
 class _HE0435(ImagingDataBase):
 
     def __init__(self, x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
-                 uncertainty_in_fluxes, supersample_factor=1.0):
+                 uncertainty_in_fluxes, supersample_factor, image_data_filter):
 
         z_lens = 0.45
         z_source = 1.69
         # we use all three flux ratios to constrain the model
         keep_flux_ratio_index = [0, 1, 2]
-        self._psf_estimate_init = psf_model
-        self._psf_error_map_init = psf_error_map
-        self._image_data = image_data
+        self._filter = image_data_filter
+        if self._filter == 'f814w':
+            self._psf_estimate_init = psf_model
+            self._psf_error_map_init = psf_error_map
+            self._image_data = image_data
+        elif self._filter == 'f555w':
+            self._psf_error_map_init = psf_model_f555w
+            self._psf_error_map_init = psf_error_map_f555w
+            self._image_data = image_data_f555w
         self._supersample_factor = supersample_factor
         image_band = [self.kwargs_data, self.kwargs_psf, self.kwargs_numerics]
         multi_band_list = [image_band]
@@ -39,12 +48,22 @@ class _HE0435(ImagingDataBase):
     @property
     def kwargs_data(self):
         _, ra_at_xy_0, dec_at_xy_0, transform_pix2angle, _ = self.coordinate_properties
-        kwargs_data = {'background_rms': 0.01181,
-                       'exposure_time': 1445.0,
-                       'ra_at_xy_0': ra_at_xy_0,
-                       'dec_at_xy_0': dec_at_xy_0,
-                       'transform_pix2angle': transform_pix2angle,
-                       'image_data': self._image_data}
+        if self._filter == 'f814w':
+            kwargs_data = {'background_rms': 0.01181,
+                           'exposure_time': 1445.0,
+                           'ra_at_xy_0': ra_at_xy_0,
+                           'dec_at_xy_0': dec_at_xy_0,
+                           'transform_pix2angle': transform_pix2angle,
+                           'image_data': self._image_data}
+        elif self._filter == 'f555w':
+            kwargs_data = {'background_rms': 0.007946,
+                           'exposure_time': 2030.0,
+                           'ra_at_xy_0': ra_at_xy_0,
+                           'dec_at_xy_0': dec_at_xy_0,
+                           'transform_pix2angle': transform_pix2angle,
+                           'image_data': self._image_data}
+        else:
+            raise Exception('filter must be either f814w or f555w')
         return kwargs_data
 
     @property
@@ -54,13 +73,24 @@ class _HE0435(ImagingDataBase):
 
     @property
     def coordinate_properties(self):
-        deltaPix = 0.05
-        window_size = 110 * deltaPix
-        ra_at_xy_0 = 2.75069576
-        dec_at_xy_0 = -2.74962
-        transform_pix2angle = np.array([[-5.00058809e-02, -6.76934349e-06],
-                                        [-6.75231528e-06,  4.99999709e-02]])
-        return deltaPix, ra_at_xy_0, dec_at_xy_0, transform_pix2angle, window_size
+        if self._filter == 'f814w':
+            deltaPix = 0.05
+            window_size = 110 * deltaPix
+            ra_at_xy_0 = 2.75069576
+            dec_at_xy_0 = -2.74962
+            transform_pix2angle = np.array([[-5.00058809e-02, -6.76934349e-06],
+                                            [-6.75231528e-06,  4.99999709e-02]])
+            return deltaPix, ra_at_xy_0, dec_at_xy_0, transform_pix2angle, window_size
+        elif self._filter == 'f555w':
+            deltaPix = 0.05
+            window_size = 110 * deltaPix
+            ra_at_xy_0 = 2.750695
+            dec_at_xy_0 = -2.74962
+            transform_pix2angle = np.array([[-5.00058808e-02, -6.76926675e-06],
+                                            [-6.75236526e-06,  4.99999710e-02]])
+            return deltaPix, ra_at_xy_0, dec_at_xy_0, transform_pix2angle, window_size
+        else:
+            raise Exception('filter must be either f814w or f555w')
 
     @property
     def kwargs_psf(self):
@@ -72,7 +102,7 @@ class _HE0435(ImagingDataBase):
 
 class HE0435_HST(_HE0435):
 
-    def __init__(self, supersample_factor=1.0):
+    def __init__(self, supersample_factor=1.0, image_data_filter='f814w'):
         """
 
         :param image_position_uncertainties: list of astrometric uncertainties for each image
@@ -102,5 +132,5 @@ class HE0435_HST(_HE0435):
         uncertainty_in_fluxes = True
         super(HE0435_HST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties,
                                           flux_uncertainties, uncertainty_in_fluxes=uncertainty_in_fluxes,
-                                         supersample_factor=supersample_factor)
+                                         supersample_factor=supersample_factor, image_data_filter=image_data_filter)
 

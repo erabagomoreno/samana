@@ -34,12 +34,3 @@ class B1422_HST(_B1422):
         image_position_uncertainties = [0.005] * 4
         super(B1422_HST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=True)
-
-# from lenstronomy.LensModel.lens_model import LensModel
-# from lenstronomy.LensModel.Solver.solver4point import Solver4Point
-# solver = Solver4Point(LensModel(['EPL', 'SHEAR']), 'PROFILE_SHEAR')
-# lens = B1422_HST()
-# kwargs = [{'theta_E': 1.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.1, 'e2': 0.1, 'gamma': 2.0},
-#           {'gamma1': 0.1, 'gamma2': 0.1}]
-# constraint = solver.constraint_lensmodel(lens.x_image, lens.y_image, kwargs)
-# print(constraint[0])

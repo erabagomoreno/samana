@@ -37,7 +37,6 @@ def sample_prior(kwargs_prior):
                 q_mean, q_sigma = None, None
             else:
                 q_mean, q_sigma = kwargs_prior[param_name][0], kwargs_prior[param_name][1]
-            print(q_mean, q_sigma)
             a3a, delta_phi_m3, a4a, delta_phi_m4 = pdf.sample(q_mean, q_sigma)
             prior_samples_dict['a3_a'] = a3a
             prior_samples_dict['a4_a'] = a4a
@@ -46,6 +45,8 @@ def sample_prior(kwargs_prior):
             sample_list += [a3a, a4a, delta_phi_m3, delta_phi_m4]
             sample_names += ['a3_a', 'a4_a', 'delta_phi_m3', 'delta_phi_m4']
             joint_multipole_prior_used = True
+        elif param_name == 'BAYESIAN_HIERARCHICAL_MULTIPOLES':
+            raise Exception('not yet implemented')
         else:
             prior_type = kwargs_prior[param_name][0]
             if prior_type == 'FIXED':
