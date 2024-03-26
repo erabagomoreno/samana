@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from samana.Data.data_base import ImagingDataBase
 from samana.data_util import mask_quasar_images
 from copy import deepcopy
@@ -108,3 +109,19 @@ class WGDJ0405_JWST(_WGDJ0405):
         super(WGDJ0405_JWST, self).__init__(image_position_uncertainty, flux_uncertainties,
                                                        normalized_magnifications,
                                                        uncertainty_in_fluxes, supersample_factor)
+
+# xc = np.array([1.0656, 0.0026, 0.7222, -0.1562]) - 0.35
+# yc = np.array([0.3204, -0.0017, 1.1589, 1.0206]) - 0.6
+# fc = np.array([1.0, 0.508, 0.920, 0.658])
+#
+# lens = WGDJ0405_HST()
+# flux_ratios = np.round(lens.magnifications/lens.magnifications[0],2)
+#
+# colors = ['k', 'r','g','m']
+# for i in range(0, 4):
+#     plt.scatter(lens.x_image[i], lens.y_image[i],color=colors[i])
+#     plt.scatter(xc[i], yc[i], color=colors[i],marker='+')
+#     plt.annotate(str(flux_ratios[i]),
+#                  xy=(lens.x_image[i], lens.y_image[i]),color=colors[i])
+#
+# plt.show()

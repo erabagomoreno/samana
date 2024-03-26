@@ -34,3 +34,4 @@ class B1422_HST(_B1422):
         image_position_uncertainties = [0.005] * 4
         super(B1422_HST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=True)
+

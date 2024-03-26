@@ -65,7 +65,9 @@ class Mock2DataWDM(MockBase):
         astrometric_uncertainties = [0.003] * 4
         flux_ratio_uncertainties = None
 
-
+        self.a3a_true = 0.0002277
+        self.a4a_true = -0.004348
+        self.delta_phi_m3_true = -0.067025
         self.delta_phi_m4_true = 0.0
         if cosmos_source:
             image_data = cosmos_image_data_wdm

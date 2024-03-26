@@ -129,3 +129,20 @@ class PSJ1606_HST(_PSJ1606):
         super(PSJ1606_HST, self).__init__(x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                                           uncertainty_in_fluxes=True, supersample_factor=supersample_factor)
 
+import matplotlib.pyplot as plt
+
+xc = np.array([1.6217, -0.0005, 0.8328, 0.4948]) - 0.5
+yc = np.array([0.5890, 0.0003, -0.3170, 0.7377]) - 0.2
+fc = np.array([0.867,1.0, 0.670, 0.694])
+
+lens = PSJ1606_HST()
+flux_ratios = np.round(lens.magnifications/lens.magnifications[0],2)
+
+colors = ['k', 'r','g','m']
+for i in range(0, 4):
+    plt.scatter(lens.x_image[i], lens.y_image[i],color=colors[i])
+    plt.scatter(xc[i], yc[i], color=colors[i],marker='+')
+    plt.annotate(str(flux_ratios[i]),
+                 xy=(lens.x_image[i], lens.y_image[i]),color=colors[i])
+
+plt.show()
