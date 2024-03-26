@@ -4,7 +4,6 @@ import pickle
 
 class _B1422ModelBase(ModelBase):
 
-
     def __init__(self, data_class, kde_sampler, shapelets_order):
         self._shapelets_order = shapelets_order
         super(_B1422ModelBase, self).__init__(data_class, kde_sampler)
