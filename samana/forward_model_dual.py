@@ -182,12 +182,15 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                 parameter_array = params
             else:
                 parameter_array = np.vstack((parameter_array, params))
+            if dual_flag:
+                if mags_out is None:
+                    mags_out2 = magnifications2
+                else:
+                    mags_out2 = np.vstack((mags_out2, magnifications2))    
             if mags_out is None:
                 mags_out = magnifications
-                mags_out2 = magnifications2
             else:
-                mags_out = np.vstack((mags_out, magnifications))
-                mags_out2 = np.vstack((mags_out2, magnifications2))
+                mags_out = np.vstack((mags_out, magnifications))                
             if macromodel_samples_array is None:
                 macromodel_samples_array = np.array(macromodel_samples)
             else:
