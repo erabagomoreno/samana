@@ -1,1 +1,4 @@
 log10_sigma_sub log_mc source_size_pc_1 source_size_pc_2 bic summary_statistic flux_ratio_likelihood logL_image_data seed 
+log10_sigma_sub log_mc source_size_pc_1 source_size_pc_2 bic summary_statistic flux_ratio_likelihood logL_image_data seed 
+-1.4926398 4.0293699 7.1481232 48.6852826 4739.0591279 0.3698945 0.0 -1943.0480538 2422243678.0 
+-1.4957247 4.0060279 6.2185055 56.5431118 4872.9105983 0.2598228 0.0 -1950.5479262 2422243679.0 

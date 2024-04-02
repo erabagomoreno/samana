@@ -59,6 +59,8 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
 
     filename_parameters, filename_mags, filename_realizations, filename_sampling_rate, filename_acceptance_ratio, \
     filename_macromodel_samples = filenames(output_path, job_index)
+    filename_mags2 = output_path + 'job_' + str(job_index) + '/fluxes.txt'
+
     # if the required directories do not exist, create them
     if os.path.exists(output_path) is False:
         proc = subprocess.Popen(['mkdir', output_path])
@@ -228,6 +230,14 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
                     for col in range(0, ncols):
                         f.write(str(np.round(mags_out[row, col], 5)) + ' ')
                     f.write('\n')
+            if verbose:
+                print('writing flux ratio output to ' +filename_mags2)
+            with open(filename_mags2, 'a') as f:
+                nrows, ncols = int(mags_out2.shape[0]), int(mags_out2.shape[1])
+                for row in range(0, nrows):
+                    for col in range(0, ncols):
+                        f.write(str(np.round(mags_out2[row, col], 5)) + ' ')
+                    f.write('\n')        
 
             if readout_macromodel_samples:
                 if verbose:
