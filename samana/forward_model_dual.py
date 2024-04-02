@@ -59,7 +59,7 @@ def forward_model(output_path, job_index, n_keep, data_class, model, preset_mode
 
     filename_parameters, filename_mags, filename_realizations, filename_sampling_rate, filename_acceptance_ratio, \
     filename_macromodel_samples = filenames(output_path, job_index)
-    filename_mags2 = output_path + 'job_' + str(job_index) + '/fluxes.txt'
+    filename_mags2 = output_path + 'job_' + str(job_index) + '/fluxes2.txt'
 
     # if the required directories do not exist, create them
     if os.path.exists(output_path) is False:
