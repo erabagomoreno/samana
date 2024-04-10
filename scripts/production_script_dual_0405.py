@@ -1,14 +1,14 @@
 from samana.forward_model import forward_model
-from samana.Data.wgd2038 import WGD2038_JWST
-from samana.Model.wgd2038_model import WGD2038ModelEPLM3M4Shear
+from samana.Data.wgdj0405 import WGDJ0405_JWST
+from samana.Model.wgdj0405_model import WGDJ0405ModelEPLM3M4Shear
 import os
 import numpy as np
 import sys
 
 # set the job index for the run
 job_index = int(sys.argv[1])
-data_class = WGD2038_JWST()
-model = J2038ModelEPLM3M4Shear
+data_class = WGDJ0405_JWST()
+model = WGDJ0405ModelEPLM3M4Shear
 preset_model_name = 'WDM'
 kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
                             'log_mc': ['UNIFORM', 4.0, 10.0],
@@ -17,10 +17,11 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
                             'truncation_model_subhalos': ['FIXED', 'TRUNCATION_GALACTICUS'], # specifies the tidal truncation model
                             'host_scaling_factor': ['FIXED', 0.5], # formerly k1
                             'redshift_scaling_factor': ['FIXED', 0.3], # formerly k2
-                            'cone_opening_angle_arcsec': ['FIXED', 8.0]
+                            'cone_opening_angle_arcsec': ['FIXED', 6.0]
                              }
 
-kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
+kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10],
+                        'source_size_pc_2': ['UNIFORM',40,80]}
 kwargs_sample_macro_fixed = {
         'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
@@ -29,10 +30,10 @@ kwargs_sample_macro_fixed = {
     'delta_phi_m4': ['UNIFORM', -np.pi/8, np.pi/8]
 }
 
-job_name = 'j2038'
+job_name = 'wgdj0405'
 use_imaging_data = False
-output_path = os.getenv('SCRATCH') + '/chains/'+job_name+'/'
-n_keep = 500
+output_path = os.getcwd() + '/data/chains/'+job_name+'/'
+n_keep = 20000
 tolerance = np.inf
 verbose = True
 random_seed_init = None

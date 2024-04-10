@@ -1,27 +1,31 @@
 from samana.forward_model import forward_model
-from samana.Data.wgd2038 import WGD2038_JWST
-from samana.Model.wgd2038_model import WGD2038ModelEPLM3M4Shear
+from samana.Data.psj1606 import PSJ1606_JWST
+from samana.Model.psj1606_model import PSJ1606ModelEPLM3M4Shear
 import os
 import numpy as np
 import sys
 
 # set the job index for the run
 job_index = int(sys.argv[1])
-data_class = WGD2038_JWST()
-model = J2038ModelEPLM3M4Shear
+data_class = PSJ1606_JWST()
+model = PSJ1606ModelEPLM3M4Shear
 preset_model_name = 'WDM'
-kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
+kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM',-2.5,-1.0],
                             'log_mc': ['UNIFORM', 4.0, 10.0],
                             'LOS_normalization': ['UNIFORM', 0.8,1.2],
                             'shmf_log_slope': ['GAUSSIAN',-1.9,0.05],
                             'truncation_model_subhalos': ['FIXED', 'TRUNCATION_GALACTICUS'], # specifies the tidal truncation model
                             'host_scaling_factor': ['FIXED', 0.5], # formerly k1
                             'redshift_scaling_factor': ['FIXED', 0.3], # formerly k2
-                            'cone_opening_angle_arcsec': ['FIXED', 8.0]
-                             }
+                            'cone_opening_angle_arcsec': ['FIXED', 6.0]
+                            }
 
-kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
+kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10],
+                        'source_size_pc_2': ['UNIFORM', 40,80]}
 kwargs_sample_macro_fixed = {
+    'satellite_1_theta_E': ['GAUSSIAN', 0.2, 0.05],
+    'satellite_1_x': ['GAUSSIAN', -0.2481, 0.03],
+    'satellite_1_y': ['GAUSSIAN', -1.1753, 0.03],
         'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
     'a3_a': ['GAUSSIAN', 0.0, 0.005],
@@ -29,10 +33,10 @@ kwargs_sample_macro_fixed = {
     'delta_phi_m4': ['UNIFORM', -np.pi/8, np.pi/8]
 }
 
-job_name = 'j2038'
+job_name = 'psj1606'
 use_imaging_data = False
-output_path = os.getenv('SCRATCH') + '/chains/'+job_name+'/'
-n_keep = 500
+output_path = os.getcwd() + '/data/chains/'+job_name+'/'
+n_keep = 10000
 tolerance = np.inf
 verbose = True
 random_seed_init = None

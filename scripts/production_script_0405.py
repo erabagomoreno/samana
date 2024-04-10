@@ -31,8 +31,8 @@ kwargs_sample_macro_fixed = {
 
 job_name = 'wgdj0405'
 use_imaging_data = False
-output_path = os.getenv('SCRATCH') + '/chains/'+job_name+'/'
-n_keep = 500
+output_path = os.getcwd() + '/data/chains/'+job_name+'/'
+n_keep = 5
 tolerance = np.inf
 verbose = True
 random_seed_init = None

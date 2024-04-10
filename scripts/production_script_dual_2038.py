@@ -8,7 +8,7 @@ import sys
 # set the job index for the run
 job_index = int(sys.argv[1])
 data_class = WGD2038_JWST()
-model = J2038ModelEPLM3M4Shear
+model = WGD2038ModelEPLM3M4Shear
 preset_model_name = 'WDM'
 kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
                             'log_mc': ['UNIFORM', 4.0, 10.0],
@@ -20,7 +20,8 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
                             'cone_opening_angle_arcsec': ['FIXED', 8.0]
                              }
 
-kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
+kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10],
+                        'source_size_pc_2': ['UNIFORM', 40, 80]}
 kwargs_sample_macro_fixed = {
         'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
@@ -31,8 +32,8 @@ kwargs_sample_macro_fixed = {
 
 job_name = 'j2038'
 use_imaging_data = False
-output_path = os.getenv('SCRATCH') + '/chains/'+job_name+'/'
-n_keep = 500
+output_path = os.getcwd() + '/data/chains/'+job_name+'/'
+n_keep = 20000
 tolerance = np.inf
 verbose = True
 random_seed_init = None

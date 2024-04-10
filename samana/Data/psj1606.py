@@ -7,7 +7,7 @@ class _PSJ1606(ImagingDataBase):
     def __init__(self, x_image, y_image, magnifications, image_position_uncertainties, flux_uncertainties,
                  uncertainty_in_fluxes, supersample_factor=1.0):
 
-        z_lens = 0.32
+        z_lens = 0.9
         z_source = 1.7
         # we use all three flux ratios to constrain the model
         keep_flux_ratio_index = [0, 1, 2]
