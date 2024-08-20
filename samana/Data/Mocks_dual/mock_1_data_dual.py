@@ -1,7 +1,7 @@
 import numpy as np
 from samana.Data.Mocks.base import MockBase
 from samana.Data.ImageData_DualSources.mock_1_simple_dual import image_data as simple_image_data
-
+#just to have a change
 
 class Mock1Data_dual(MockBase):
 
