@@ -1,7 +1,7 @@
 import numpy as np
 from samana.Data.Mocks.base import MockBase
-from samana.Data.ImageData_DualSources.mock_1_simple_dual import image_data as simple_image_data
-#just to have a change
+from samana.Data.ImageData.MockImageData_dual.mock_1_simple_dual import image_data as simple_image_data
+
 
 class Mock1Data_dual(MockBase):
 
@@ -27,5 +27,6 @@ class Mock1Data_dual(MockBase):
         super(Mock1Data_dual, self).__init__(z_lens, z_source, x_image, y_image,
                                     magnifications, astrometric_uncertainties, flux_ratio_uncertainties,
                                         image_data, super_sample_factor)
+
 
 

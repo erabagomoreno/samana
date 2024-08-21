@@ -462,7 +462,9 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
     tend = time()
     if verbose:
         print('computed magnifications in '+str(np.round(tend - t0, 1))+' seconds')
-        print('magnifications: ', magnifications,'magnifications2: ', magnifications2) #ER: adding a second print for mags2
+        print('magnifications: ', magnifications)
+        if dual_flag:
+            print('magnifications2: ', magnifications2) #ER: adding a second print for mags2
 
     samples_macromodel = []
     param_names_macro = []
