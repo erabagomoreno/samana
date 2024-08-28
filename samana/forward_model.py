@@ -581,6 +581,7 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
             ax.imshow(image, origin='lower')
             ax.annotate('magnification: '+str(np.round(mag,2)), xy=(0.3,0.9),
                         xycoords='axes fraction',color='w',fontsize=12)
+        plt.suptitle('JWST Magnifications')
         plt.show()
         if dual_flag:#ER: Adding mag plot for mag2
             fig = plt.figure(1)
@@ -594,6 +595,7 @@ def forward_model_single_iteration(data_class, model, preset_model_name, kwargs_
                 ax.imshow(image, origin='lower')
                 ax.annotate('magnification: ' + str(np.round(mag, 2)), xy=(0.3, 0.9),
                             xycoords='axes fraction', color='w', fontsize=12)
+            plt.suptitle('OIII Magnifications')
             plt.show()
 
         modelPlot = ModelPlot(data_class.kwargs_data_joint['multi_band_list'],

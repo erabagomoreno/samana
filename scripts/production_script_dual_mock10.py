@@ -21,7 +21,8 @@ kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
                             'cone_opening_angle_arcsec': ['FIXED', 6.0]
                              }
 
-kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10]}
+kwargs_sample_source = {'source_size_pc': ['UNIFORM', 1, 10],
+                        'source_size_pc_2': ['UNIFORM',40,80]}
 kwargs_sample_macro_fixed = {
         'gamma': ['GAUSSIAN', 2.0, 0.1],
     'a4_a': ['GAUSSIAN', 0.0, 0.01],
