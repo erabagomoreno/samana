@@ -1,7 +1,7 @@
 from samana.Model.Mocks.model_mock_lens_simple import MockModelBase
 import numpy as np
 
-class Mock20Model(MockModelBase):
+class Mock20Model_dual(MockModelBase):
 
     def setup_source_light_model(self):
         source_model_list = ['SERSIC_ELLIPSE']
