@@ -5,7 +5,7 @@ class Mock13Model_dual(MockModelBase):
 
     def setup_source_light_model(self):
         source_model_list = ['SERSIC_ELLIPSE']
-        kwargs_source_init = [{'amp': 5.0, 'center_x': 0.0, 'center_y': 0.0, 'e1': 0.05,
+        kwargs_source_init = [{'amp': 5.0, 'center_x': -0.02, 'center_y':  -0.14, 'e1': 0.05,
                   'e2': 0.1, 'R_sersic': 0.08, 'n_sersic': 4.0}]
         kwargs_source_sigma = [{'amp': 5.0, 'R_sersic': 0.025, 'n_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1,
                                 'center_y': 0.1}]

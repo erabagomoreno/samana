@@ -5,7 +5,7 @@ class Mock11Model_dual(MockModelBase):
 
     def setup_source_light_model(self):
         source_model_list = ['SERSIC_ELLIPSE']
-        kwargs_source_init = [{'amp': 15.0, 'center_x': 0, 'center_y': 0, 'e1': 0.1,
+        kwargs_source_init = [{'amp': 15.0, 'center_x': 0.1, 'center_y': 0.08, 'e1': 0.1,
                   'e2': 0.0, 'R_sersic': 0.045, 'n_sersic': 4.0}]
         kwargs_source_sigma = [{'amp': 5.0, 'R_sersic': 0.025, 'n_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1,
                                 'center_y': 0.1}]
@@ -56,9 +56,4 @@ class Mock11Model_dual(MockModelBase):
         return lens_model_list_macro, redshift_list_macro, index_lens_split, lens_model_params
 
 
-class Mock11ModelTrueSource(Mock11Model_dual):
 
-    def setup_source_light_model(self):
-        ra_source = 0.1
-        dec_source = 0.08
-        return self._setup_true_source_light_model(ra_source, dec_source)
