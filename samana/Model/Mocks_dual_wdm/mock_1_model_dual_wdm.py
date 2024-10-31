@@ -1,6 +1,6 @@
 from samana.Model.Mocks.model_mock_lens_simple import MockModelBase
 import numpy as np
-
+#m
 class Mock1Model_dual(MockModelBase):
 
     def setup_source_light_model(self):
