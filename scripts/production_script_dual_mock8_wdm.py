@@ -1,6 +1,6 @@
 from samana.forward_model import forward_model
-from samana.Data.Mocks_dual_wdm.mock_1_data_dual_wdm import Mock1Data_dual_wdm
-from samana.Model.Mocks_dual_wdm.mock_1_model_dual_wdm import Mock1Model_dual
+from samana.Data.Mocks_dual_wdm.mock_8_data_dual_wdm import Mock8Data_dual_wdm
+from samana.Model.Mocks_dual_wdm.mock_8_model_dual_wdm import Mock8Model_dual
 import os
 import numpy as np
 import sys
@@ -8,8 +8,8 @@ import sys
 
 
 job_index = int(sys.argv[1])
-data_class = Mock1Data_dual_wdm()
-model = Mock1Model_dual
+data_class = Mock8Data_dual_wdm()
+model = Mock8Model_dual
 preset_model_name = 'WDM'
 kwargs_sample_realization = {'log10_sigma_sub': ['UNIFORM', -2.5, -1.0],
                             'log_mc': ['UNIFORM', 4.0, 10.0],
@@ -31,7 +31,7 @@ kwargs_sample_macro_fixed = {
     'delta_phi_m4': ['UNIFORM', -np.pi/8, np.pi/8]
 }
 
-job_name = 'mock1_dual'
+job_name = 'mock8_dual'
 use_imaging_data = False
 output_path = os.getcwd() + '/data/chains/'+job_name+'/'
 n_keep = 1000
